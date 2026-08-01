@@ -1,0 +1,3377 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MindBridge</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+  <style>
+    /* ─── THEME TOKENS ──────────────────────────────────────────────────────── */
+    :root[data-theme="dark"] {
+      --bg:         #0B0D14;
+      --bg2:        #111320;
+      --surface:    #151929;
+      --surface2:   #1C2038;
+      --surface3:   #232847;
+      --border:     rgba(255,255,255,0.06);
+      --border2:    rgba(255,255,255,0.11);
+      --accent:     #6C8EFF;
+      --accent2:    #A78BFA;
+      --accent3:    #34D399;
+      --danger:     #F87171;
+      --warning:    #FBBF24;
+      --text:       #E4E8F5;
+      --text2:      #7B87A8;
+      --text3:      #3D4563;
+      --glow:       rgba(108,142,255,0.18);
+      --card-bg:    #151929;
+      --topbar-bg:  rgba(11,13,20,0.85);
+      --sidebar-bg: #0F1120;
+    }
+    :root[data-theme="light"] {
+      --bg:         #F0F2F8;
+      --bg2:        #E8EBF5;
+      --surface:    #FFFFFF;
+      --surface2:   #F4F5FC;
+      --surface3:   #EAECF7;
+      --border:     rgba(0,0,0,0.07);
+      --border2:    rgba(0,0,0,0.12);
+      --accent:     #4F72F0;
+      --accent2:    #7C3AED;
+      --accent3:    #059669;
+      --danger:     #DC2626;
+      --warning:    #D97706;
+      --text:       #1A1F36;
+      --text2:      #5A6282;
+      --text3:      #9BA3C4;
+      --glow:       rgba(79,114,240,0.12);
+      --card-bg:    #FFFFFF;
+      --topbar-bg:  rgba(240,242,248,0.9);
+      --sidebar-bg: #FFFFFF;
+    }
+
+    /* ─── BASE ──────────────────────────────────────────────────────────────── */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ─── LOGIN ──────────────────────────────────────────────────────────────── */
+    #login-screen {
+      position: fixed; inset: 0; z-index: 200;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+    }
+    .login-wrap {
+      width: 100%; max-width: 400px; padding: 24px;
+      text-align: center;
+    }
+    .login-logo {
+      width: 64px; height: 64px; border-radius: 20px; margin: 0 auto 20px;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; box-shadow: 0 12px 40px var(--glow);
+    }
+    .login-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 6px; }
+    .login-sub   { color: var(--text2); font-size: 14px; margin-bottom: 28px; }
+    .av-zone {
+      width: 80px; height: 80px; border-radius: 50%; margin: 0 auto 20px;
+      background: var(--surface2); border: 2px dashed var(--border2);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      cursor: pointer; overflow: hidden; position: relative; transition: border-color 0.2s;
+    }
+    .av-zone:hover { border-color: var(--accent); }
+    .av-zone img  { width:100%; height:100%; object-fit:cover; }
+    .av-zone .ov  {
+      position: absolute; inset: 0; background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; transition: 0.2s; font-size: 20px;
+    }
+    .av-zone:hover .ov { opacity: 1; }
+    .linput {
+      width: 100%; padding: 12px 16px; margin-bottom: 10px;
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: 10px; color: var(--text); font-family: 'DM Sans',sans-serif;
+      font-size: 15px; outline: none; transition: border-color 0.2s;
+    }
+    .linput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+    .lbtn {
+      width: 100%; padding: 13px; border: none; border-radius: 10px; cursor: pointer;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      color: white; font-family: 'Syne',sans-serif; font-size: 15px; font-weight: 600;
+      letter-spacing: 0.3px; transition: all 0.2s;
+    }
+    .lbtn:hover { transform: translateY(-1px); box-shadow: 0 8px 24px var(--glow); }
+    .privacy-pill {
+      margin-top: 14px; padding: 9px 14px; border-radius: 8px;
+      background: rgba(52,211,153,0.07); border: 1px solid rgba(52,211,153,0.18);
+      font-size: 12px; color: var(--accent3);
+    }
+
+    /* ─── APP SHELL ──────────────────────────────────────────────────────────── */
+    #app { display: none; height: 100vh; flex-direction: column; }
+    #app.on { display: flex; }
+
+    /* ─── TOPBAR ─────────────────────────────────────────────────────────────── */
+    #topbar {
+      height: 52px; flex-shrink: 0;
+      background: var(--topbar-bg);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(12px);
+      display: flex; align-items: center;
+      padding: 0 16px; gap: 10px;
+      position: relative; z-index: 30;
+    }
+    .tlogo {
+      font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 700;
+      display: flex; align-items: center; gap: 8px; color: var(--text);
+    }
+    .tlogo-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      display: flex; align-items: center; justify-content: center; font-size: 13px;
+    }
+
+    /* Emotion status bar in topbar */
+    #emotion-bar {
+      display: flex; align-items: center; gap: 0;
+      margin-left: 16px; flex: 1;
+    }
+    .ebar-item {
+      display: flex; flex-direction: column; padding: 0 16px;
+      border-right: 1px solid var(--border2); min-width: 100px;
+    }
+    .ebar-item:last-child { border-right: none; }
+    .ebar-label { font-size: 9px; font-weight: 600; letter-spacing: 1.2px; text-transform: uppercase; color: var(--text3); margin-bottom: 2px; }
+    .ebar-val   { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); display: flex; align-items: center; gap: 5px; }
+    .emotion-chip {
+      padding: 2px 8px; border-radius: 6px; font-size: 11px; font-weight: 600;
+      font-family: 'Syne',sans-serif; text-transform: capitalize;
+    }
+    .confidence-bar-wrap {
+      width: 80px; height: 4px; background: var(--surface3); border-radius: 2px; margin-top: 4px;
+    }
+    .confidence-bar-fill {
+      height: 100%; border-radius: 2px;
+      background: linear-gradient(90deg,var(--accent),var(--accent2));
+      transition: width 0.6s ease;
+    }
+    .trend-icon { font-size: 16px; }
+
+    .topbar-right { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+    .theme-btn {
+      width: 34px; height: 34px; border-radius: 10px; border: 1px solid var(--border2);
+      background: var(--surface); cursor: pointer; display: flex; align-items: center;
+      justify-content: center; font-size: 15px; transition: all 0.2s; color: var(--text);
+    }
+    .theme-btn:hover { background: var(--surface2); border-color: var(--accent); }
+    .topbar-av {
+      width: 32px; height: 32px; border-radius: 50%; overflow: hidden; cursor: pointer;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne',sans-serif; font-size: 13px; font-weight: 700; color: white;
+      border: 2px solid var(--border2); transition: border-color 0.2s;
+    }
+    .topbar-av:hover { border-color: var(--accent); }
+    .topbar-av img { width:100%; height:100%; object-fit:cover; }
+
+    /* ─── LAYOUT ─────────────────────────────────────────────────────────────── */
+    #layout { display: flex; flex: 1; overflow: hidden; }
+
+    /* ─── SIDEBAR ────────────────────────────────────────────────────────────── */
+    #sidebar {
+      width: 240px; flex-shrink: 0;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      padding: 16px 12px; overflow-y: auto;
+    }
+    .user-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 10px; border-radius: 12px;
+      background: var(--surface); border: 1px solid var(--border2);
+      margin-bottom: 20px; cursor: pointer; transition: border-color 0.2s;
+    }
+    .user-card:hover { border-color: var(--accent); }
+    .user-av {
+      width: 36px; height: 36px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne',sans-serif; font-size: 14px; font-weight: 700; color: white;
+    }
+    .user-av img { width:100%; height:100%; object-fit:cover; }
+    .user-info .uname { font-family:'Syne',sans-serif; font-size:13px; font-weight:600; }
+    .user-info .umeta { font-size:11px; color:var(--text2); }
+
+    .snav-group { margin-bottom: 20px; }
+    .snav-label {
+      font-size: 9px; font-weight: 700; letter-spacing: 1.4px;
+      text-transform: uppercase; color: var(--text3);
+      padding: 0 8px; margin-bottom: 4px;
+    }
+    .snav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 9px; cursor: pointer;
+      transition: all 0.15s; color: var(--text2);
+      font-size: 13px; font-weight: 500; border: 1px solid transparent;
+    }
+    .snav-item:hover { background: var(--surface2); color: var(--text); }
+    .snav-item.active {
+      background: var(--surface); color: var(--text);
+      border-color: var(--border2);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .snav-item .ni { font-size: 14px; width: 18px; text-align: center; flex-shrink: 0; }
+    .snav-bottom { margin-top: auto; }
+    .snav-item.out:hover { color: var(--danger); background: rgba(248,113,113,0.07); }
+
+    /* ─── MAIN PANELS ────────────────────────────────────────────────────────── */
+    #main { flex: 1; overflow: hidden; display: flex; flex-direction: column; }
+    .panel { display: none; flex: 1; flex-direction: column; overflow: hidden; }
+    .panel.active { display: flex; }
+
+    /* ─── CHAT PANEL ──────────────────────────────────────────────────────────  */
+    #messages {
+      flex: 1; overflow-y: auto; padding: 20px 24px;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    #messages::-webkit-scrollbar { width: 4px; }
+    #messages::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+    .msg-row { display: flex; gap: 10px; animation: up 0.3s ease; }
+    @keyframes up { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
+    .msg-row.u { flex-direction: row-reverse; }
+    .mav {
+      width: 30px; height: 30px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; overflow: hidden; margin-top: 2px;
+    }
+    .mav img { width:100%;height:100%;object-fit:cover; }
+    .mc { max-width: 74%; display: flex; flex-direction: column; gap: 3px; }
+    .msg-row.u .mc { align-items: flex-end; }
+    .mb {
+      padding: 11px 15px; border-radius: 14px;
+      font-size: 14px; line-height: 1.6; word-wrap: break-word;
+    }
+    .bb { background: var(--surface); border: 1px solid var(--border2); border-bottom-left-radius: 4px; }
+    .ub { background: linear-gradient(135deg,var(--accent),#5B7FE8); color: white; border-bottom-right-radius: 4px; }
+    .cb { background: rgba(127,29,29,0.4); border: 1px solid var(--danger); }
+    .mdb{ background: rgba(30,58,95,0.5); border: 1px solid #3B82F6; }
+    .mtag { font-size: 9px; color: var(--text3); font-family: monospace; padding: 0 2px; }
+    .sys-bub {
+      align-self: center; max-width: 85%;
+      background: rgba(251,191,36,0.07); border: 1px solid rgba(251,191,36,0.2);
+      border-radius: 10px; padding: 9px 14px; font-size: 12px; color: var(--warning);
+      text-align: center; animation: up 0.3s ease;
+    }
+    .mem-bub { background: var(--surface); border: 1px solid var(--border2); border-radius: 12px; overflow: hidden; max-width: 260px; }
+    .mem-bub img { width:100%; max-height:180px; object-fit:cover; }
+    .mem-cap { padding: 9px 12px; font-size: 13px; color: var(--text2); }
+    .dots { display: flex; gap: 4px; align-items: center; padding: 3px; }
+    .dots span { width:5px; height:5px; border-radius:50%; background:var(--text3); animation: dt 1.2s infinite; }
+    .dots span:nth-child(2){animation-delay:0.2s} .dots span:nth-child(3){animation-delay:0.4s}
+    @keyframes dt { 0%,80%,100%{transform:scale(0.7);opacity:0.4} 40%{transform:scale(1);opacity:1} }
+
+    /* Input bar */
+    #input-bar {
+      background: var(--surface); border-top: 1px solid var(--border);
+      padding: 12px 20px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0;
+    }
+    #irow { display: flex; gap: 8px; align-items: flex-end; }
+    #userinput {
+      flex: 1; background: var(--bg2); border: 1px solid var(--border2);
+      color: var(--text); padding: 10px 14px; border-radius: 10px;
+      font-size: 14px; font-family: 'DM Sans',sans-serif;
+      outline: none; resize: none; min-height: 42px; max-height: 120px;
+      transition: border-color 0.2s;
+    }
+    #userinput:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--glow); }
+    .ibtn {
+      width: 42px; height: 42px; border-radius: 10px; border: none; flex-shrink: 0;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: all 0.15s;
+    }
+    #sbtn { background: linear-gradient(135deg,var(--accent),var(--accent2)); color: white; box-shadow: 0 4px 12px var(--glow); }
+    #sbtn:hover:not(:disabled) { transform: scale(1.05); }
+    #sbtn:disabled { background: var(--surface3); color: var(--text3); box-shadow: none; cursor: not-allowed; }
+    #mbtn { background: var(--bg2); border: 1px solid var(--border2); color: var(--text2); }
+    #mbtn:hover { background: var(--surface2); color: var(--text); }
+    #mbtn.rec { background: rgba(248,113,113,0.12); border-color: var(--danger); color: var(--danger); animation: pulse 1s infinite; }
+    @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(248,113,113,0.4)} 50%{box-shadow:0 0 0 8px rgba(248,113,113,0)} }
+    #imgbtn { background: var(--bg2); border: 1px solid var(--border2); color: var(--text2); }
+    #imgbtn:hover { background: var(--surface2); color: var(--text); }
+    .ihint { font-size: 11px; color: var(--text3); padding: 0 2px; }
+    #vstatus { font-size: 12px; color: var(--danger); display: none; }
+
+    /* ─── MEDITATION ──────────────────────────────────────────────────────── */
+    .med-timer-ring { position:relative; width:180px; height:180px; margin:0 auto 20px; }
+    .med-timer-ring svg { transform:rotate(-90deg); }
+    .med-ring-bg  { fill:none; stroke:var(--surface3); stroke-width:10; }
+    .med-ring-fill{ fill:none; stroke:url(#medGrad); stroke-width:10; stroke-linecap:round;
+                    stroke-dasharray:502; stroke-dashoffset:502; transition:stroke-dashoffset 1s linear; }
+    .med-timer-num {
+      position:absolute; inset:0; display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+    }
+    .med-time-display { font-family:'Syne',sans-serif; font-size:36px; font-weight:700; color:var(--text); }
+    .med-time-label  { font-size:11px; color:var(--text3); margin-top:2px; }
+    .med-btns { display:flex; gap:10px; justify-content:center; margin-bottom:20px; }
+    .med-btn {
+      padding:10px 24px; border-radius:10px; border:none; cursor:pointer;
+      font-family:'Syne',sans-serif; font-size:13px; font-weight:600; transition:all 0.2s;
+    }
+    .med-btn.start { background:linear-gradient(135deg,var(--accent3),#059669); color:white; }
+    .med-btn.pause { background:linear-gradient(135deg,var(--warning),#D97706); color:white; }
+    .med-btn.reset { background:var(--surface2); color:var(--text2); border:1px solid var(--border2); }
+    .med-preset-row { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:24px; }
+    .med-preset {
+      padding:6px 14px; border-radius:20px; border:1px solid var(--border2);
+      background:var(--surface2); cursor:pointer; font-size:12px; color:var(--text2);
+      transition:all 0.15s;
+    }
+    .med-preset:hover,.med-preset.sel { background:var(--accent); border-color:var(--accent); color:white; }
+    .med-graph-bar-wrap { display:flex; align-items:flex-end; gap:4px; height:80px; margin-top:8px; }
+    .med-bar {
+      flex:1; border-radius:4px 4px 0 0; min-height:4px;
+      background:linear-gradient(to top,var(--accent3),var(--accent));
+      transition:height 0.4s; cursor:pointer;
+    }
+    .med-bar-label { font-size:9px; color:var(--text3); text-align:center; margin-top:4px; }
+    .reward-row { display:flex; align-items:center; gap:12px; padding:12px 16px;
+                  background:var(--surface2); border-radius:10px; margin-top:12px; }
+    .reward-pts { font-family:'Syne',sans-serif; font-size:22px; font-weight:700; color:var(--warning); }
+    .reward-badge {
+      padding:3px 10px; border-radius:20px; font-size:11px; font-weight:600;
+      background:rgba(251,191,36,0.15); border:1px solid rgba(251,191,36,0.3); color:var(--warning);
+    }
+
+    /* ─── YOGA ──────────────────────────────────────────────────────────────── */
+    .yoga-level-tabs { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+    .yoga-tab {
+      padding:7px 16px; border-radius:8px; border:1px solid var(--border2);
+      background:var(--surface2); cursor:pointer; font-size:12px; font-weight:500;
+      color:var(--text2); transition:all 0.15s;
+    }
+    .yoga-tab.active { background:var(--accent2); border-color:var(--accent2); color:white; }
+    .yoga-item {
+      display:flex; align-items:center; gap:12px; padding:12px 14px;
+      border-radius:10px; border:1px solid var(--border2); margin-bottom:8px;
+      background:var(--card-bg); cursor:pointer; transition:border-color 0.15s;
+    }
+    .yoga-item:hover { border-color:var(--accent2); }
+    .yoga-item.done  { border-color:var(--accent3); background:rgba(52,211,153,0.05); }
+    .yoga-check {
+      width:22px; height:22px; border-radius:6px; border:2px solid var(--border2);
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+      font-size:13px; transition:all 0.2s;
+    }
+    .yoga-item.done .yoga-check { background:var(--accent3); border-color:var(--accent3); color:white; }
+    .yoga-name  { font-weight:600; font-size:13px; }
+    .yoga-desc  { font-size:11px; color:var(--text2); margin-top:2px; }
+    .yoga-pts   { margin-left:auto; font-size:11px; color:var(--warning); font-weight:600; flex-shrink:0; }
+    .yoga-progress-wrap { background:var(--surface3); border-radius:4px; height:6px; margin:10px 0; }
+    .yoga-progress-fill { height:100%; border-radius:4px; background:linear-gradient(90deg,var(--accent2),var(--accent)); transition:width 0.5s; }
+
+    /* ─── MOVIES ─────────────────────────────────────────────────────────────── */
+    .mood-chips { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+    .mood-chip {
+      padding:8px 18px; border-radius:20px; border:1px solid var(--border2);
+      background:var(--surface2); cursor:pointer; font-size:13px; font-weight:500;
+      color:var(--text2); transition:all 0.15s; display:flex; align-items:center; gap:6px;
+    }
+    .mood-chip:hover  { border-color:var(--accent); color:var(--text); }
+    .mood-chip.active { border-color:var(--accent); background:var(--accent); color:white; }
+    .movie-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(160px,1fr)); gap:14px; }
+    .movie-card {
+      background:var(--card-bg); border:1px solid var(--border2); border-radius:12px;
+      overflow:hidden; transition:all 0.2s; cursor:pointer;
+    }
+    .movie-card:hover { border-color:var(--accent); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.3); }
+    .movie-thumb {
+      width:100%; height:110px; object-fit:cover;
+      background:linear-gradient(135deg,var(--surface2),var(--surface3));
+      display:flex; align-items:center; justify-content:center; font-size:40px;
+    }
+    .movie-info { padding:10px; }
+    .movie-title { font-weight:600; font-size:12px; margin-bottom:3px; line-height:1.3; }
+    .movie-meta  { font-size:10px; color:var(--text2); }
+    .movie-rating { color:var(--warning); font-size:10px; margin-top:4px; }
+    .movies-loading { text-align:center; padding:40px; color:var(--text3); font-size:14px; }
+
+    /* ─── CONTACTS ───────────────────────────────────────────────────────────── */
+    .contacts-add-form {
+      background:var(--surface); border:1px solid var(--border2); border-radius:12px;
+      padding:16px; margin-bottom:20px; display:flex; flex-direction:column; gap:10px;
+    }
+    .contacts-fields { display:flex; gap:8px; flex-wrap:wrap; }
+    .contact-inp {
+      flex:1; min-width:120px; padding:9px 12px; border-radius:8px;
+      border:1px solid var(--border2); background:var(--bg2);
+      color:var(--text); font-size:13px; outline:none; font-family:'DM Sans',sans-serif;
+    }
+    .contact-inp:focus { border-color:var(--accent); }
+    .contact-add-btn {
+      padding:9px 18px; border-radius:8px; border:none; cursor:pointer;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      color:white; font-size:13px; font-weight:600; white-space:nowrap;
+    }
+    .contact-list { display:flex; flex-direction:column; gap:8px; }
+    .contact-card {
+      display:flex; align-items:center; gap:12px; padding:12px 14px;
+      background:var(--card-bg); border:1px solid var(--border2); border-radius:10px;
+      transition:border-color 0.15s;
+    }
+    .contact-card:hover { border-color:var(--accent); }
+    .contact-av {
+      width:38px; height:38px; border-radius:50%; flex-shrink:0;
+      background:linear-gradient(135deg,var(--accent),var(--accent2));
+      display:flex; align-items:center; justify-content:center;
+      font-family:'Syne',sans-serif; font-size:15px; font-weight:700; color:white;
+    }
+    .contact-info .cname  { font-weight:600; font-size:13px; }
+    .contact-info .crel   { font-size:11px; color:var(--text2); }
+    .contact-info .cphone { font-size:11px; color:var(--accent); margin-top:1px; }
+    .contact-del {
+      margin-left:auto; background:none; border:none; cursor:pointer;
+      color:var(--text3); font-size:16px; padding:4px; border-radius:6px; transition:color 0.15s;
+    }
+    .contact-del:hover { color:var(--danger); }
+
+    /* Notification toast */
+    #med-toast {
+      position:fixed; bottom:30px; left:50%; transform:translateX(-50%) translateY(60px);
+      background:linear-gradient(135deg,var(--accent3),#059669); color:white;
+      padding:12px 24px; border-radius:12px; font-weight:600; font-size:14px;
+      box-shadow:0 8px 32px rgba(0,0,0,0.4); z-index:999; transition:transform 0.4s;
+    }
+    #med-toast.show { transform:translateX(-50%) translateY(0); }
+    .pscroll { flex: 1; overflow-y: auto; padding: 28px 28px; display: flex; flex-direction: column; gap: 20px; }
+    .pscroll::-webkit-scrollbar { width: 4px; }
+    .pscroll::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+    .ptop { margin-bottom: 8px; }
+    .ptitle { font-family: 'Syne',sans-serif; font-size: 26px; font-weight: 700; }
+    .psub   { color: var(--text2); font-size: 14px; margin-top: 4px; }
+
+    /* Cards */
+    .card {
+      background: var(--card-bg); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 20px;
+    }
+    .ctitle {
+      font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+      text-transform: uppercase; color: var(--text3); margin-bottom: 12px;
+    }
+
+    /* Emotion Insights panel */
+    .ei-user-card {
+      background: var(--surface); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 20px 24px;
+      display: flex; align-items: flex-start; gap: 14px;
+    }
+    .ei-av {
+      width: 52px; height: 52px; border-radius: 50%; overflow: hidden; flex-shrink: 0;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne',sans-serif; font-size: 20px; font-weight: 700; color: white;
+    }
+    .ei-av img { width:100%;height:100%;object-fit:cover; }
+    .ei-info .eiuser { font-family:'Syne',sans-serif; font-size:16px; font-weight:700; }
+    .ei-info .eimeta { font-size:12px; color:var(--text2); margin-top:2px; }
+    .ei-insight {
+      margin-top: 12px; padding: 10px 14px;
+      background: var(--surface2); border-radius: 8px;
+      font-size: 13px; color: var(--text2);
+    }
+    .ei-consistency {
+      margin-top: 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .ei-con-label { font-size: 12px; color: var(--text3); }
+    .ei-con-bar {
+      flex: 1; height: 5px; background: var(--surface3); border-radius: 3px; overflow: hidden;
+    }
+    .ei-con-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg,var(--accent),var(--accent3)); transition: width 1s ease; }
+
+    .ei-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .ei-card {
+      background: var(--card-bg); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 18px;
+    }
+    .ei-card-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--text3); margin-bottom: 8px; }
+    .ei-card-main  { font-family: 'Syne',sans-serif; font-size: 22px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
+    .ei-card-sub   { font-size: 12px; color: var(--text2); margin-top: 4px; }
+
+    /* Emotion distribution in insights */
+    .edist-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .edist-label { font-size: 12px; color: var(--text2); width: 110px; text-align: right; text-transform: capitalize; }
+    .edist-bar   { flex: 1; height: 7px; background: var(--surface3); border-radius: 4px; overflow: hidden; }
+    .edist-fill  { height: 100%; border-radius: 4px; transition: width 1s ease; }
+    .edist-cnt   { font-size: 11px; color: var(--text3); width: 28px; }
+
+    /* Analytics panel */
+    .an-kpi-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+    .kpi-card {
+      background: var(--card-bg); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 20px;
+    }
+    .kpi-icon { font-size: 22px; margin-bottom: 8px; }
+    .kpi-num  { font-family: 'Syne',sans-serif; font-size: 28px; font-weight: 700; }
+    .kpi-lbl  { font-size: 12px; color: var(--text2); margin-top: 2px; }
+
+    .dom-card {
+      background: var(--card-bg); border: 1px solid var(--border2);
+      border-radius: 14px; padding: 20px; display: flex; align-items: center; gap: 14px;
+    }
+    .dom-icon { width: 44px; height: 44px; border-radius: 12px; background: var(--surface2); display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+    .dom-main { font-family: 'Syne',sans-serif; font-size: 18px; font-weight: 700; text-transform: capitalize; }
+    .dom-sub  { font-size: 12px; color: var(--text2); }
+
+    #weekly-canvas { width: 100%; height: 110px; }
+
+    /* History panel */
+    .hist-entry {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 16px; border-radius: 10px;
+      background: var(--card-bg); border: 1px solid var(--border2);
+      margin-bottom: 8px; transition: border-color 0.15s;
+    }
+    .hist-entry:hover { border-color: var(--accent); }
+    .hdot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .hemoji { font-size: 18px; flex-shrink: 0; }
+    .hbody { flex: 1; }
+    .hem   { font-weight: 600; font-size: 13px; text-transform: capitalize; }
+    .htopic{ font-size: 11px; color: var(--text2); }
+    .htime { font-size: 11px; color: var(--text3); }
+    .date-row-ui { display: flex; gap: 8px; margin-bottom: 16px; }
+    .date-inp-ui {
+      background: var(--surface); border: 1px solid var(--border2); color: var(--text);
+      padding: 8px 12px; border-radius: 8px; font-size: 13px;
+      font-family: 'DM Sans',sans-serif; outline: none;
+    }
+    .btn-sm {
+      padding: 8px 16px; border: none; border-radius: 8px;
+      background: var(--accent); color: white; font-size: 13px;
+      font-family: 'Syne',sans-serif; font-weight: 600; cursor: pointer;
+    }
+    .btn-sm.alt { background: var(--surface2); color: var(--text2); border: 1px solid var(--border2); }
+
+    /* Profile panel */
+    .prof-av-big {
+      width: 80px; height: 80px; border-radius: 50%; overflow: hidden; cursor: pointer;
+      background: linear-gradient(135deg,var(--accent),var(--accent2));
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Syne',sans-serif; font-size: 30px; font-weight: 700; color: white;
+      border: 3px solid var(--border2); transition: border-color 0.2s; margin-bottom: 10px;
+    }
+    .prof-av-big img { width:100%;height:100%;object-fit:cover; }
+    .prof-av-big:hover { border-color: var(--accent); }
+
+    /* Freeze overlay */
+    #freeze-ov {
+      display: none; position: fixed; inset: 0;
+      background: rgba(11,13,20,0.9); z-index: 100;
+      align-items: center; justify-content: center; backdrop-filter: blur(8px);
+    }
+    .freeze-box {
+      background: var(--surface); border: 1px solid rgba(251,191,36,0.25);
+      border-radius: 18px; padding: 36px; max-width: 360px; text-align: center;
+      box-shadow: 0 0 60px rgba(251,191,36,0.08);
+    }
+    .fspinner {
+      width: 46px; height: 46px; border-radius: 50%; margin: 0 auto 16px;
+      border: 3px solid var(--surface3); border-top-color: var(--warning);
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #ftimer { font-family: 'Syne',sans-serif; font-size: 30px; font-weight: 700; margin: 12px 0; }
+
+    /* Image preview bar */
+    #img-preview-bar {
+      display: none; align-items: center; gap: 8px; padding: 6px 10px;
+      background: var(--bg2); border: 1px solid var(--border2);
+      border-radius: 8px;
+    }
+    #img-preview-bar img { width:44px; height:44px; object-fit:cover; border-radius:6px; }
+    .iclr { background: none; border: none; color: var(--text3); cursor: pointer; font-size: 16px; margin-left: auto; }
+
+    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+    @media (max-width: 640px) {
+      #sidebar { display: none; }
+      .an-kpi-grid { grid-template-columns: 1fr 1fr; }
+      .ei-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-logo">🧠</div>
+    <div class="login-title">MindBridge</div>
+    <div class="login-sub">Your private emotional support companion</div>
+    <div class="av-zone" id="lav" onclick="document.getElementById('lavf').click()">
+      <span style="font-size:24px;color:var(--text3)">👤</span>
+      <span style="font-size:10px;color:var(--text3);margin-top:2px">Add Photo</span>
+      <div class="ov">📷</div>
+    </div>
+    <input type="file" id="lavf" accept="image/*" style="display:none" onchange="prevAv(event)">
+    <input class="linput" id="nminput" placeholder="Your name" maxlength="30"
+      onkeydown="if(event.key==='Enter')startChat()"
+      oninput="autoLoadLoginAvatar(this.value.trim())">
+    <button class="lbtn" onclick="startChat()">Start Chatting →</button>
+    <div class="privacy-pill">🔒 No conversations stored. Only emotion vectors saved locally.</div>
+  </div>
+</div>
+
+<!-- FREEZE -->
+<div id="freeze-ov">
+  <div class="freeze-box">
+    <div class="fspinner"></div>
+    <div style="font-family:'Syne',sans-serif;font-size:17px;font-weight:700;color:var(--warning)">Model Update In Progress</div>
+    <div id="ftimer">0s</div>
+    <div style="color:var(--text2);font-size:13px">MindBridge is updating its global model. Please wait.</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div style="display:flex;flex-direction:column;height:100vh">
+
+    <!-- Topbar -->
+    <div id="topbar">
+      <div class="tlogo">
+        <div class="tlogo-icon">🧠</div>
+        MindBridge
+      </div>
+      <div id="model-badge" style="margin-left:10px;padding:4px 10px;border-radius:20px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;color:var(--text2);display:flex;align-items:center;gap:5px">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--accent3);display:inline-block"></span>
+        <span id="model-status-text">v1.0</span>
+      </div>
+
+      <!-- Emotion status bar -->
+      <div id="emotion-bar">
+        <div class="ebar-item">
+          <div class="ebar-label">Current Emotion</div>
+          <div class="ebar-val">
+            <span id="eb-emotion-chip" class="emotion-chip" style="background:var(--surface3);color:var(--text2)">neutral</span>
+          </div>
+        </div>
+        <div class="ebar-item">
+          <div class="ebar-label">Previous</div>
+          <div class="ebar-val" id="eb-prev">—</div>
+        </div>
+        <div class="ebar-item">
+          <div class="ebar-label">Trend</div>
+          <div class="ebar-val"><span id="eb-trend" class="trend-icon">➡️</span> <span id="eb-trend-text" style="font-size:12px">stable</span></div>
+        </div>
+        <div class="ebar-item" style="border-right:none">
+          <div class="ebar-label">Confidence</div>
+          <div class="ebar-val" id="eb-conf">0%</div>
+          <div class="confidence-bar-wrap">
+            <div class="confidence-bar-fill" id="eb-conf-bar" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-right">
+        <button class="theme-btn" onclick="toggleTheme()" id="theme-btn" title="Toggle theme">🌙</button>
+        <div class="topbar-av" id="topav" onclick="showPanel('profile')">
+          <span id="topav-letter">?</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="layout">
+      <!-- Sidebar -->
+      <div id="sidebar">
+        <div class="user-card" onclick="showPanel('profile')">
+          <div class="user-av" id="sav"><span id="sav-letter">?</span></div>
+          <div class="user-info">
+            <div class="uname" id="sname">Loading...</div>
+            <div class="umeta" id="smeta">0 sessions · 0 msgs</div>
+          </div>
+        </div>
+
+        <div class="snav-group">
+          <div class="snav-label">Workspace</div>
+          <div class="snav-item active" id="nav-chat" onclick="showPanel('chat')">
+            <span class="ni">💬</span> Chat
+          </div>
+          <div class="snav-item" id="nav-insights" onclick="showPanel('insights')">
+            <span class="ni">🔮</span> Emotion Insights
+          </div>
+          <div class="snav-item" id="nav-analytics" onclick="showPanel('analytics')">
+            <span class="ni">📊</span> Analytics
+          </div>
+          <div class="snav-item" id="nav-history" onclick="showPanel('history')">
+            <span class="ni">🕐</span> History
+          </div>
+        </div>
+
+        <div class="snav-group">
+          <div class="snav-label">Wellness</div>
+          <div class="snav-item" id="nav-meditation" onclick="showPanel('meditation')">
+            <span class="ni">🧘</span> Meditation
+          </div>
+          <div class="snav-item" id="nav-yoga" onclick="showPanel('yoga')">
+            <span class="ni">🤸</span> Yoga Guide
+          </div>
+          <div class="snav-item" id="nav-movies" onclick="showPanel('movies')">
+            <span class="ni">🎬</span> Movie Suggestions
+          </div>
+          <div class="snav-item" id="nav-contacts" onclick="showPanel('contacts')">
+            <span class="ni">📞</span> My Contacts
+          </div>
+        </div>
+
+        <div class="snav-group">
+          <div class="snav-label">Account</div>
+          <div class="snav-item" id="nav-profile" onclick="showPanel('profile')">
+            <span class="ni">👤</span> Profile
+          </div>
+        </div>
+
+        <div class="snav-bottom">
+          <div class="snav-item out" onclick="logout()">
+            <span class="ni">⚙️</span> Sign Out
+          </div>
+        </div>
+      </div>
+
+      <!-- Main -->
+      <div id="main">
+
+        <!-- CHAT -->
+        <div class="panel active" id="panel-chat" style="flex-direction:column">
+          <div id="messages"></div>
+          <div id="input-bar">
+            <div id="vstatus"></div>
+            <!-- Multi-image preview tray -->
+            <div id="img-preview-bar" style="display:none;flex-direction:column;gap:8px;
+              padding:8px 10px;background:var(--bg2);border:1px solid var(--border2);border-radius:10px">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <span style="font-size:12px;color:var(--accent);font-weight:500">📎 Photos attached</span>
+                <div style="display:flex;align-items:center;gap:8px">
+                  <span id="img-tray-count" style="font-size:11px;color:var(--text3)"></span>
+                  <button onclick="clearImgPrev()"
+                    style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:0">✕</button>
+                </div>
+              </div>
+              <div id="img-tray-thumbs" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+            </div>
+            <div id="irow">
+              <button class="ibtn" id="imgbtn" onclick="document.getElementById('imgf').click()" title="Attach photo">📎</button>
+              <input type="file" id="imgf" accept="image/*" multiple style="display:none" onchange="handleImgs(event)">
+              <textarea id="userinput" placeholder="How are you feeling today? (Enter to send)"
+                onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg()}"
+                rows="1"></textarea>
+              <button class="ibtn" id="mbtn" onclick="toggleVoice()" title="Voice">🎙️</button>
+              <button class="ibtn" id="sbtn" onclick="sendMsg()">➤</button>
+            </div>
+            <div class="ihint">Enter to send · Shift+Enter new line · 🎙️ voice</div>
+          </div>
+        </div>
+
+        <!-- EMOTION INSIGHTS -->
+        <div class="panel" id="panel-insights">
+          <div class="pscroll">
+            <div class="ptop">
+              <div class="ptitle">Emotion Insights</div>
+              <div class="psub">Real-time emotional awareness and personalized behavioral patterns.</div>
+            </div>
+
+            <div class="ei-user-card" id="ei-user-card">
+              <div class="ei-av" id="ei-av">?</div>
+              <div class="ei-info" style="flex:1">
+                <div class="eiuser" id="ei-uname">Loading...</div>
+                <div class="eimeta" id="ei-umeta">0 sessions · 0 messages</div>
+                <div class="ei-insight" id="ei-insight">Start chatting to unlock your personalized behavioral insights.</div>
+                <div class="ei-consistency">
+                  <span class="ei-con-label">Emotional Consistency</span>
+                  <div class="ei-con-bar"><div class="ei-con-fill" id="ei-con-fill" style="width:0%"></div></div>
+                  <span style="font-size:11px;color:var(--text3)" id="ei-con-pct">0%</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="ei-grid">
+              <div class="ei-card">
+                <div class="ei-card-label">Current Emotion</div>
+                <div class="ei-card-main" id="ei-cur-em">
+                  <span id="ei-cur-emoji">😶</span>
+                  <span id="ei-cur-txt">neutral</span>
+                </div>
+                <div class="ei-card-sub">😶 Detected</div>
+              </div>
+              <div class="ei-card">
+                <div class="ei-card-label">Previous Emotion</div>
+                <div class="ei-card-main" id="ei-prev-em" style="font-size:16px;color:var(--text2)">—</div>
+                <div class="ei-card-sub">Last detected</div>
+              </div>
+              <div class="ei-card">
+                <div class="ei-card-label">Trend</div>
+                <div class="ei-card-main" id="ei-trend-val">➡️ stable</div>
+                <div class="ei-card-sub">Emotional direction</div>
+              </div>
+              <div class="ei-card">
+                <div class="ei-card-label">Confidence</div>
+                <div class="ei-card-main" id="ei-conf-val">0%</div>
+                <div class="ei-card-sub">Detection certainty</div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="ctitle">Emotion Distribution</div>
+              <div id="ei-edist">
+                <div style="color:var(--text3);text-align:center;padding:20px;font-size:13px">Emotion data will appear here as you chat.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ANALYTICS -->
+        <div class="panel" id="panel-analytics">
+          <div class="pscroll">
+            <div class="ptop">
+              <div class="ptitle">Analytics Dashboard</div>
+              <div class="psub">A high-level view of your emotional journey and usage patterns.</div>
+            </div>
+            <div class="an-kpi-grid" id="an-kpi"></div>
+            <div class="dom-card" id="an-dom">
+              <div class="dom-icon" id="an-dom-icon">😶</div>
+              <div>
+                <div class="ctitle" style="margin-bottom:4px">Dominant Emotion</div>
+                <div class="dom-main" id="an-dom-text">Awaiting Data</div>
+                <div class="dom-sub" id="an-dom-sub">Chat to see your dominant emotional pattern.</div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ctitle">Weekly Emotional Trend</div>
+              <canvas id="weekly-canvas" style="width:100%;height:160px"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- HISTORY -->
+        <div class="panel" id="panel-history">
+          <div class="pscroll">
+            <div class="ptop">
+              <div class="ptitle">Emotion History</div>
+              <div class="psub">Browse your emotional timeline by date.</div>
+            </div>
+            <div class="date-row-ui">
+              <input type="date" class="date-inp-ui" id="hist-date">
+              <button class="btn-sm" onclick="loadHistory()">View</button>
+              <button class="btn-sm alt" onclick="loadHistory('today')">Today</button>
+            </div>
+            <div id="hist-list"></div>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="panel" id="panel-profile">
+          <div class="pscroll">
+            <div class="ptop">
+              <div class="ptitle">My Profile</div>
+              <div class="psub">Manage your account and preferences.</div>
+            </div>
+            <div class="card" style="display:flex;flex-direction:column;align-items:center;padding:32px">
+              <div class="prof-av-big" id="prof-av" onclick="document.getElementById('prof-av-f').click()">
+                <span id="prof-av-letter">?</span>
+              </div>
+              <input type="file" id="prof-av-f" accept="image/*" style="display:none" onchange="uploadAv(event)">
+              <div style="color:var(--text3);font-size:12px;margin-bottom:16px">Click to change photo</div>
+              <div id="prof-name" style="font-family:'Syne',sans-serif;font-size:22px;font-weight:700;margin-bottom:4px"></div>
+              <div id="prof-meta" style="color:var(--text2);font-size:13px;margin-bottom:16px"></div>
+              <textarea id="prof-bio" class="linput"
+                placeholder="Write something about yourself..."
+                style="height:80px;resize:none;max-width:360px;width:100%"></textarea>
+              <button class="lbtn" style="max-width:200px;margin-top:10px" onclick="saveProfile()">
+                Save Profile
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- MEDITATION -->
+        <div class="panel" id="panel-meditation">
+          <div class="pscroll">
+            <div class="ptop">
+              <div class="ptitle">🧘 Meditation Timer</div>
+              <div class="psub">Track your meditation sessions and earn reward points.</div>
+            </div>
+
+            <!-- Timer presets -->
+            <div class="card" style="text-align:center;padding:28px">
+              <div class="med-preset-row">
+                <div class="med-preset sel" onclick="setMedPreset(5,this)">5 min</div>
+                <div class="med-preset" onclick="setMedPreset(10,this)">10 min</div>
+                <div class="med-preset" onclick="setMedPreset(15,this)">15 min</div>
+                <div class="med-preset" onclick="setMedPreset(20,this)">20 min</div>
+                <div class="med-preset" onclick="setMedPreset(30,this)">30 min</div>
+              </div>
+
+              <!-- Ring timer -->
+              <div class="med-timer-ring">
+                <svg width="180" height="180" viewBox="0 0 180 180">
+                  <defs>
+                    <linearGradient id="medGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" style="stop-color:#34D399"/>
+                      <stop offset="100%" style="stop-color:#6C8EFF"/>
+                    </linearGradient>
+                  </defs>
+                  <circle class="med-ring-bg"   cx="90" cy="90" r="80"/>
+                  <circle class="med-ring-fill" id="med-ring" cx="90" cy="90" r="80"/>
+                </svg>
+                <div class="med-timer-num">
+                  <div class="med-time-display" id="med-display">05:00</div>
+                  <div class="med-time-label" id="med-phase">Ready</div>
+                </div>
+              </div>
+
+              <div class="med-btns">
+                <button class="med-btn start" id="med-start-btn" onclick="medStart()">▶ Start</button>
+                <button class="med-btn pause" id="med-pause-btn" onclick="medPause()" style="display:none">⏸ Pause</button>
+                <button class="med-btn reset" onclick="medReset()">↺ Reset</button>
+              </div>
+
+              <!-- Breath guide bar -->
+              <div id="breath-guide" style="display:none;margin:16px 0 8px">
+                <div style="font-size:12px;color:var(--text2);margin-bottom:8px;font-weight:600" id="breath-label">🌬️ Breathe In...</div>
+                <div style="width:100%;height:12px;background:var(--surface3);border-radius:6px;overflow:hidden">
+                  <div id="breath-bar" style="height:100%;width:0%;border-radius:6px;
+                    background:linear-gradient(90deg,var(--accent3),var(--accent));
+                    transition:width 4s ease-in-out,background 0.5s"></div>
+                </div>
+              </div>
+
+              <div style="font-size:12px;color:var(--text3)">
+                🔔 A gentle beep will notify you when time is up
+              </div>
+            </div>
+
+            <!-- Today's stats -->
+            <div class="card">
+              <div class="ctitle">Today's Sessions</div>
+              <div id="med-today-stats" style="color:var(--text3);font-size:13px">No sessions yet today. Start meditating!</div>
+            </div>
+
+            <!-- Meditation graph -->
+            <div class="card">
+              <div class="ctitle">7-Day Meditation Tracker</div>
+              <div style="display:flex;align-items:flex-end;gap:6px;height:90px" id="med-graph"></div>
+              <div style="display:flex;gap:6px" id="med-graph-labels"></div>
+            </div>
+
+            <!-- Rewards -->
+            <div class="card">
+              <div class="ctitle">Reward Points</div>
+              <div class="reward-row">
+                <div>
+                  <div class="reward-pts" id="med-points">0 pts</div>
+                  <div style="font-size:12px;color:var(--text2)">Earned from meditation sessions</div>
+                </div>
+                <div class="reward-badge" id="med-badge">Beginner 🌱</div>
+              </div>
+              <div style="font-size:12px;color:var(--text3);margin-top:10px">
+                +10 pts per session · Bonus +20 pts for 20+ min sessions
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- YOGA GUIDE -->
+        <div class="panel" id="panel-yoga">
+          <div class="pscroll">
+            <div class="ptop">
+              <div class="ptitle">🤸 Yoga Guide</div>
+              <div class="psub">From beginner to pro — track your practice and earn points.</div>
+            </div>
+
+            <!-- Level tabs -->
+            <div class="yoga-level-tabs" id="yoga-tabs">
+              <div class="yoga-tab active" onclick="switchYogaLevel('beginner',this)">🌱 Beginner</div>
+              <div class="yoga-tab" onclick="switchYogaLevel('intermediate',this)">🌿 Intermediate</div>
+              <div class="yoga-tab" onclick="switchYogaLevel('advanced',this)">🌳 Advanced</div>
+              <div class="yoga-tab" onclick="switchYogaLevel('pranayama',this)">🌬️ Pranayama</div>
+            </div>
+
+            <!-- Progress -->
+            <div class="card" style="padding:16px">
+              <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                <span style="font-size:13px;font-weight:600" id="yoga-level-label">Beginner Progress</span>
+                <span style="font-size:12px;color:var(--text2)" id="yoga-progress-pct">0%</span>
+              </div>
+              <div class="yoga-progress-wrap"><div class="yoga-progress-fill" id="yoga-prog-fill" style="width:0%"></div></div>
+              <div style="display:flex;justify-content:space-between;margin-top:8px">
+                <span style="font-size:12px;color:var(--text3)" id="yoga-done-count">0 / 0 poses done</span>
+                <div class="reward-badge" id="yoga-reward-pts">0 pts 🌟</div>
+              </div>
+            </div>
+
+            <!-- Pose list -->
+            <div id="yoga-list"></div>
+          </div>
+        </div>
+
+        <!-- MOVIE SUGGESTIONS -->
+        <div class="panel" id="panel-movies">
+          <div class="pscroll">
+            <div class="ptop">
+              <div class="ptitle">🎬 Movie Suggestions</div>
+              <div class="psub">Pick a mood and get curated movie picks just for you.</div>
+            </div>
+
+            <div class="card" style="padding:18px">
+              <div class="ctitle">Choose Your Mood(s) — Select Multiple!</div>
+              <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Tap multiple moods to get a combined list of movie suggestions</div>
+              <div class="mood-chips" id="mood-chips">
+                <div class="mood-chip active" data-mood="happy"    onclick="selectMood('happy',this)">😊 Happy</div>
+                <div class="mood-chip"        data-mood="romantic" onclick="selectMood('romantic',this)">💕 Romantic</div>
+                <div class="mood-chip"        data-mood="comedy"   onclick="selectMood('comedy',this)">😂 Comedy</div>
+                <div class="mood-chip"        data-mood="family"   onclick="selectMood('family',this)">👨‍👩‍👧 Family</div>
+                <div class="mood-chip"        data-mood="thriller" onclick="selectMood('thriller',this)">😰 Thriller</div>
+                <div class="mood-chip"        data-mood="suspense" onclick="selectMood('suspense',this)">🔍 Suspense</div>
+                <div class="mood-chip"        data-mood="sad"      onclick="selectMood('sad',this)">😢 Emotional</div>
+                <div class="mood-chip"        data-mood="action"   onclick="selectMood('action',this)">💥 Action</div>
+              </div>
+              <button class="contact-add-btn" onclick="loadMovies()" style="width:100%;margin-top:10px">
+                🎬 Get Movie Suggestions
+              </button>
+            </div>
+
+            <div id="movie-results">
+              <div class="movies-loading">Select a mood above and click Get Movie Suggestions 🎬</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTACTS -->
+        <div class="panel" id="panel-contacts">
+          <div class="pscroll">
+            <div class="ptop">
+              <div class="ptitle">📞 My Contacts</div>
+              <div class="psub">Add friends & family — MindBridge will suggest reaching out when you need support.</div>
+            </div>
+
+            <!-- Add form -->
+            <div class="contacts-add-form">
+              <div class="ctitle">Add a Contact</div>
+              <div class="contacts-fields">
+                <input class="contact-inp" id="c-name"  placeholder="Name *" />
+                <input class="contact-inp" id="c-rel"   placeholder="Relationship (e.g. Friend)" />
+                <input class="contact-inp" id="c-phone" placeholder="Phone number" type="tel" />
+              </div>
+              <button class="contact-add-btn" onclick="addContact()">+ Add Contact</button>
+            </div>
+
+            <!-- Contact list -->
+            <div class="card" style="padding:16px">
+              <div class="ctitle">Your Contacts (<span id="contact-count">0</span>)</div>
+              <div class="contact-list" id="contact-list">
+                <div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">
+                  No contacts yet. Add your first contact above!
+                </div>
+              </div>
+            </div>
+
+            <div style="background:rgba(108,142,255,0.07);border:1px solid rgba(108,142,255,0.2);border-radius:10px;padding:14px;font-size:12px;color:var(--text2)">
+              💡 <strong>How it works:</strong> When MindBridge detects you're feeling heavy or stressed,
+              it will suggest reaching out to one of your contacts by name in the chat response.
+              Your contact list is stored privately on your device only.
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /main -->
+
+      <!-- Meditation end beep (hidden audio) -->
+      <audio id="med-beep" preload="auto">
+        <source src="data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFhYF+fXx8e3p6enp6enp6enp6enp6e3x8fX6BhYqFhYF+fXx8e3p6enp6enp6enp6enp6e3x8fX6BhYqFhYF+fXx8e3p6enp6" type="audio/wav">
+      </audio>
+      <div id="med-toast">🔔 Meditation complete! Great job!</div>
+  </div>
+</div>
+
+<script>
+// ─── STATE ──────────────────────────────────────────────────────────────────
+let CU         = "";   // current user name
+let avB64      = "";   // login avatar
+let pendingImg = "";   // legacy single-image (kept for backward compat)
+let pendingImgs = [];  // multi-image tray (up to 10)
+let lastEm     = "";   // last emotion for topbar
+let mediaRec   = null;
+let audioChunks = [];
+let isRecording = false;
+let freezeTimer = null;
+
+// ─── CLIENT MODE DETECTION ────────────────────────────────────────────────
+// If running on port 5001 → client.py (data stored on disk via local server)
+// If running on port 5000 → app.py   (data stored in localStorage)
+const CLIENT_MODE = (location.port === "5001");
+
+// ─── CLIENT-SIDE FEDERATED STORAGE (only used in app.py / port 5000 mode) ──
+// All personal data (emotion history, profile, avatar) lives in localStorage
+// on THIS device. The server never writes it to disk — true federated privacy.
+const ClientStore = {
+  _key: (name) => `mindbridge_${name.toLowerCase()}`,
+
+  load(name) {
+    try {
+      const raw = localStorage.getItem(this._key(name));
+      return raw ? JSON.parse(raw) : {};
+    } catch(e) { return {}; }
+  },
+
+  save(name, data) {
+    try {
+      localStorage.setItem(this._key(name), JSON.stringify(data));
+    } catch(e) { console.warn("[ClientStore] save failed:", e); }
+  },
+
+  merge(name, serverMemory) {
+    if (!serverMemory) return;
+    const local = this.load(name);
+    local.memory  = serverMemory;
+    local.updated = new Date().toISOString();
+    this.save(name, local);
+  },
+
+  saveAvatar(name, b64)   { const l=this.load(name); l.avatar_b64=b64; this.save(name,l); },
+  saveProfile(name, prof) { const l=this.load(name); l.profile=prof;   this.save(name,l); },
+
+  getMemory(name)  { return this.load(name).memory      || {}; },
+  getAvatar(name)  { return this.load(name).avatar_b64  || ""; },
+  getProfile(name) { return this.load(name).profile      || {}; },
+};
+let retrainPoller = null;
+
+const EMOTION_EMOJIS = {
+  admiration:"🌟",amusement:"😄",anger:"😠",annoyance:"😤",approval:"👍",
+  caring:"🤗",confusion:"😕",curiosity:"🤔",desire:"💫",disappointment:"😞",
+  disapproval:"👎",disgust:"🤢",embarrassment:"😳",excitement:"🎉",fear:"😨",
+  gratitude:"🙏",grief:"💔",joy:"😊",love:"❤️",nervousness:"😰",
+  optimism:"🌈",pride:"💪",realization:"💡",relief:"😌",remorse:"😔",
+  sadness:"😢",surprise:"😲",neutral:"😶"
+};
+
+const EC = {
+  joy:"#22C55E",love:"#EC4899",gratitude:"#10B981",excitement:"#F59E0B",
+  admiration:"#6366F1",amusement:"#8B5CF6",approval:"#14B8A6",caring:"#F97316",
+  optimism:"#EAB308",pride:"#84CC16",relief:"#06B6D4",surprise:"#A855F7",
+  sadness:"#3B82F6",grief:"#1E3A5F",anger:"#EF4444",annoyance:"#F87171",
+  fear:"#7C3AED",disappointment:"#6B7280",disapproval:"#DC2626",disgust:"#92400E",
+  embarrassment:"#DB2777",nervousness:"#9333EA",remorse:"#1D4ED8",
+  confusion:"#94A3B8",curiosity:"#38BDF8",desire:"#FB923C",
+  realization:"#A3E635",neutral:"#CBD5E1"
+};
+
+const TREND_ICONS = {
+  worsening:"⬇️", improving:"⬆️", persistent_negative:"🔻",
+  persistent_positive:"🔺", mixed:"↔️", stable:"➡️"
+};
+
+// ─── THEME ──────────────────────────────────────────────────────────────────
+function toggleTheme() {
+  const curr = document.documentElement.getAttribute("data-theme");
+  const next = curr === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", next);
+  document.getElementById("theme-btn").textContent = next === "dark" ? "🌙" : "☀️";
+}
+
+// ─── LOGIN ──────────────────────────────────────────────────────────────────
+function prevAv(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    avB64 = ev.target.result;
+    const z = document.getElementById("lav");
+    z.innerHTML = `<img src="${avB64}"><div class="ov">📷</div>`;
+  };
+  r.readAsDataURL(file);
+}
+
+function autoLoadLoginAvatar(name) {
+  // Always reset avB64 when name changes — prevents previous user's avatar bleeding
+  avB64 = "";
+  const z = document.getElementById("lav");
+
+  if (!name || name.length < 2) {
+    // Clear login avatar if name is too short
+    if (z) z.innerHTML = `<span style="font-size:24px;color:var(--text3)">👤</span>
+      <span style="font-size:10px;color:var(--text3);margin-top:2px">Add Photo</span>
+      <div class="ov">📷</div>`;
+    return;
+  }
+  // Load avatar from localStorage for this specific user name
+  const stored = ClientStore.getAvatar(name);
+  if (stored) {
+    avB64 = stored;
+    if (z) z.innerHTML = `<img src="${stored}"><div class="ov">📷</div>`;
+  } else {
+    // No avatar stored for this user — show default
+    if (z) z.innerHTML = `<span style="font-size:24px;color:var(--text3)">👤</span>
+      <span style="font-size:10px;color:var(--text3);margin-top:2px">Add Photo</span>
+      <div class="ov">📷</div>`;
+  }
+}
+
+function startChat() {
+  const name = document.getElementById("nminput").value.trim() || "guest";
+  CU = name;
+
+  // In CLIENT_MODE (port 5001), client.py stores data on disk — no localStorage needed.
+  // In app.py mode (port 5000), we send/receive memory via localStorage.
+  const storedMemory  = CLIENT_MODE ? {} : ClientStore.getMemory(name);
+  const storedAvatar  = CLIENT_MODE ? "" : (avB64 || ClientStore.getAvatar(name));
+  const storedProfile = CLIENT_MODE ? {} : ClientStore.getProfile(name);
+
+  const btn = document.querySelector(".lbtn");
+  const origText = btn.textContent;
+  btn.textContent = "Connecting...";
+  btn.disabled = true;
+
+  const body = CLIENT_MODE
+    ? JSON.stringify({ name })
+    : JSON.stringify({ name, memory: storedMemory, profile: storedProfile });
+
+  fetch("/start", { method:"POST", headers:{"Content-Type":"application/json"}, body })
+  .then(r => r.json())
+  .then(async d => {
+    // Save returned memory to localStorage only in app.py mode
+    if (!CLIENT_MODE && d.memory) ClientStore.merge(name, d.memory);
+
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").classList.add("on");
+    btn.textContent = origText;
+    btn.disabled    = false;
+
+    const letter = name[0].toUpperCase();
+    ["topav-letter","sav-letter","prof-av-letter"].forEach(id => {
+      document.getElementById(id).textContent = letter;
+    });
+    document.getElementById("sname").textContent = name;
+    document.getElementById("smeta").textContent =
+      `${d.sessions||0} sessions · ${d.total_messages||0} msgs`;
+    document.getElementById("prof-name").textContent = name;
+    document.getElementById("prof-meta").textContent =
+      `Member since ${d.profile?.joined||storedProfile?.joined||"today"}`;
+    document.getElementById("ei-uname").textContent = name;
+    document.getElementById("ei-umeta").textContent =
+      `${d.sessions||0} sessions · ${d.total_messages||0} messages`;
+
+    const bio = d.profile?.bio || storedProfile?.bio || "";
+    if (bio) document.getElementById("prof-bio").value = bio;
+
+    // Avatar: client.py serves /avatar/<name> from disk; app.py uses localStorage
+    if (CLIENT_MODE) {
+      if (d.has_avatar) setAv(`/avatar/${name}?t=${Date.now()}`);
+      else if (avB64)   setAv(avB64);
+    } else {
+      if (storedAvatar) setAv(storedAvatar);
+      else if (avB64) { ClientStore.saveAvatar(name, avB64); setAv(avB64); }
+    }
+
+    if (d.retrain_info) {
+      const ri = d.retrain_info;
+      document.getElementById("model-status-text").textContent = `Updated ${ri.date}`;
+      addSys(`🔄 Model updated ${ri.date} — ${ri.clients} users · ${Math.round((ri.avg_accuracy||0)*100)}% accuracy`);
+    }
+
+    addBot(d.greeting, null, false, false);
+    document.getElementById("hist-date").value = new Date().toISOString().split("T")[0];
+    document.getElementById("userinput").focus();
+    startRetrainPoll();
+  })
+  .catch(err => {
+    btn.textContent = origText;
+    btn.disabled = false;
+    let msg = "";
+    if (location.protocol === "https:" && (err.message||"").toLowerCase().includes("fetch")) {
+      msg = `⚠️ Browser blocked the connection (self-signed certificate).\n\n`
+          + `Fix for Brave / Chrome:\n`
+          + `1. Click the 🔒 or ⚠️ icon in the address bar\n`
+          + `2. Click "Certificate is not valid" → "Advanced"\n`
+          + `3. Click "Proceed to ${location.hostname} (unsafe)"\n\n`
+          + `OR open: http://${location.hostname}:5000 (HTTP, no cert warning)`;
+    } else {
+      msg = `Connection failed: ${err.message}\n\nMake sure the server is running:\npython app.py`;
+    }
+    alert(msg);
+  });
+}
+
+function setAv(src) {
+  ["topav","sav","ei-av","prof-av"].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    if (id === "ei-av") { el.innerHTML = `<img src="${src}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; }
+    else el.innerHTML = `<img src="${src}">`;
+  });
+}
+
+// ─── TOPBAR EMOTION UPDATE ────────────────────────────────────────────────────
+function updateEmotionBar(emotion, confidence, trend) {
+  const prev = lastEm;
+  lastEm     = emotion;
+  const color = EC[emotion] || "#CBD5E1";
+  const emoji = EMOTION_EMOJIS[emotion] || "😶";
+  const chip  = document.getElementById("eb-emotion-chip");
+  chip.textContent  = `${emoji} ${emotion}`;
+  chip.style.background = color + "22";
+  chip.style.color      = color;
+  chip.style.border     = `1px solid ${color}44`;
+
+  if (prev && prev !== emotion) {
+    document.getElementById("eb-prev").textContent =
+      `${EMOTION_EMOJIS[prev]||"😶"} ${prev}`;
+  }
+
+  const pct = Math.round(confidence * 100);
+  document.getElementById("eb-conf").textContent = pct + "%";
+  document.getElementById("eb-conf-bar").style.width = pct + "%";
+  document.getElementById("eb-trend").textContent      = TREND_ICONS[trend] || "➡️";
+  document.getElementById("eb-trend-text").textContent  = trend;
+
+  // Also update insights panel live
+  document.getElementById("ei-cur-emoji").textContent = emoji;
+  document.getElementById("ei-cur-txt").textContent   = emotion;
+  document.getElementById("ei-trend-val").textContent = `${TREND_ICONS[trend]||"➡️"} ${trend}`;
+  document.getElementById("ei-conf-val").textContent  = pct + "%";
+  if (prev) document.getElementById("ei-prev-em").textContent =
+    `${EMOTION_EMOJIS[prev]||"😶"} ${prev}`;
+}
+
+// ─── NAVIGATION ────────────────────────────────────────────────────────────
+function showPanel(name) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".snav-item").forEach(i => i.classList.remove("active"));
+  document.getElementById(`panel-${name}`).classList.add("active");
+  const n = document.getElementById(`nav-${name}`);
+  if (n) n.classList.add("active");
+  if (name === "insights")  loadInsights();
+  if (name === "analytics") loadAnalytics();
+  if (name === "history")   loadHistory();
+}
+
+function showPanel(name) {
+  document.querySelectorAll(".panel").forEach(p => p.classList.remove("active"));
+  document.querySelectorAll(".snav-item").forEach(i => i.classList.remove("active"));
+  document.getElementById(`panel-${name}`).classList.add("active");
+  const n = document.getElementById(`nav-${name}`);
+  if (n) n.classList.add("active");
+  if (name === "insights")   loadInsights();
+  if (name === "analytics")  loadAnalytics();
+  if (name === "history")    loadHistory();
+  if (name === "meditation") renderMedGraph();
+  if (name === "yoga")       renderYogaList("beginner");
+  if (name === "contacts")   renderContacts();
+  if (name === "movies")     { selectedMood = "happy"; }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONTACTS
+// ══════════════════════════════════════════════════════════════════════════════
+function getContacts() {
+  try { return JSON.parse(localStorage.getItem(`mb_contacts_${CU}`) || "[]"); }
+  catch(e) { return []; }
+}
+function saveContacts(list) {
+  localStorage.setItem(`mb_contacts_${CU}`, JSON.stringify(list));
+}
+function addContact() {
+  const name  = document.getElementById("c-name").value.trim();
+  const rel   = document.getElementById("c-rel").value.trim()   || "Contact";
+  const phone = document.getElementById("c-phone").value.trim() || "";
+  if (!name) { alert("Please enter a name."); return; }
+  const list = getContacts();
+  list.push({ id: Date.now(), name, rel, phone });
+  saveContacts(list);
+  document.getElementById("c-name").value  = "";
+  document.getElementById("c-rel").value   = "";
+  document.getElementById("c-phone").value = "";
+  renderContacts();
+}
+function deleteContact(id) {
+  saveContacts(getContacts().filter(c => c.id !== id));
+  renderContacts();
+}
+function renderContacts() {
+  const list = getContacts();
+  document.getElementById("contact-count").textContent = list.length;
+  const el = document.getElementById("contact-list");
+  if (!list.length) {
+    el.innerHTML = `<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">No contacts yet. Add your first contact above!</div>`;
+    return;
+  }
+  el.innerHTML = list.map(c => `
+    <div class="contact-card">
+      <div class="contact-av">${c.name[0].toUpperCase()}</div>
+      <div class="contact-info">
+        <div class="cname">${esc(c.name)}</div>
+        <div class="crel">${esc(c.rel)}</div>
+        ${c.phone ? `<div class="cphone">📞 ${esc(c.phone)}</div>` : ""}
+      </div>
+      <button class="contact-del" onclick="deleteContact(${c.id})" title="Remove">🗑️</button>
+    </div>`).join("");
+}
+function getRandomContact() {
+  const list = getContacts();
+  return list.length ? list[Math.floor(Math.random() * list.length)] : null;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MEDITATION TIMER
+// ══════════════════════════════════════════════════════════════════════════════
+let medTotal   = 300;   // seconds
+let medLeft    = 300;
+let medRunning = false;
+let medInterval = null;
+let breathInterval = null;
+const CIRC     = 2 * Math.PI * 80;  // 502.65
+
+function getMedData() {
+  try { return JSON.parse(localStorage.getItem(`mb_med_${CU}`) || "{}"); }
+  catch(e) { return {}; }
+}
+function saveMedData(d) { localStorage.setItem(`mb_med_${CU}`, JSON.stringify(d)); }
+
+function setMedPreset(mins, el) {
+  document.querySelectorAll(".med-preset").forEach(e => e.classList.remove("sel"));
+  el.classList.add("sel");
+  medTotal = mins * 60;
+  medLeft  = medTotal;
+  medRunning = false;
+  clearInterval(medInterval);
+  stopBreathBar();
+  updateMedDisplay();
+  document.getElementById("med-start-btn").style.display = "";
+  document.getElementById("med-pause-btn").style.display = "none";
+}
+function updateMedDisplay() {
+  const m = String(Math.floor(medLeft / 60)).padStart(2, "0");
+  const s = String(medLeft % 60).padStart(2, "0");
+  document.getElementById("med-display").textContent = `${m}:${s}`;
+  const pct = 1 - medLeft / medTotal;
+  const offset = CIRC - pct * CIRC;
+  document.getElementById("med-ring").style.strokeDashoffset = offset;
+  document.getElementById("med-phase").textContent =
+    medRunning ? (medLeft > medTotal * 0.66 ? "Settle in 🌿" :
+                  medLeft > medTotal * 0.33 ? "Deep focus 🧘" : "Final stretch ✨")
+               : (medLeft === medTotal ? "Ready" : "Paused");
+}
+
+// ── Breath bar animation ──────────────────────────────────────────────────────
+// 4s breathe in → 4s breathe out cycle, smooth CSS transitions
+let breathPhase = "in";
+function startBreathBar() {
+  const guide = document.getElementById("breath-guide");
+  const bar   = document.getElementById("breath-bar");
+  const label = document.getElementById("breath-label");
+  if (!guide) return;
+  guide.style.display = "block";
+  breathPhase = "in";
+
+  function runCycle() {
+    if (!medRunning) return;
+    if (breathPhase === "in") {
+      label.textContent = "🌬️ Breathe In...";
+      bar.style.background = "linear-gradient(90deg,var(--accent3),var(--accent))";
+      bar.style.transition = "width 4s ease-in-out, background 0.5s";
+      bar.style.width = "100%";
+      breathPhase = "out";
+      breathInterval = setTimeout(runCycle, 4200);
+    } else {
+      label.textContent = "😮‍💨 Breathe Out...";
+      bar.style.background = "linear-gradient(90deg,var(--accent),var(--accent2))";
+      bar.style.transition = "width 4s ease-in-out, background 0.5s";
+      bar.style.width = "0%";
+      breathPhase = "in";
+      breathInterval = setTimeout(runCycle, 4200);
+    }
+  }
+  runCycle();
+}
+function stopBreathBar() {
+  clearTimeout(breathInterval);
+  breathInterval = null;
+  const guide = document.getElementById("breath-guide");
+  const bar   = document.getElementById("breath-bar");
+  if (guide) guide.style.display = "none";
+  if (bar)   { bar.style.transition = "none"; bar.style.width = "0%"; }
+}
+
+function medStart() {
+  if (medRunning) return;
+  medRunning = true;
+  document.getElementById("med-start-btn").style.display = "none";
+  document.getElementById("med-pause-btn").style.display = "";
+  startBreathBar();
+  medInterval = setInterval(() => {
+    if (medLeft <= 0) { medDone(); return; }
+    medLeft--;
+    updateMedDisplay();
+  }, 1000);
+}
+function medPause() {
+  medRunning = false;
+  clearInterval(medInterval);
+  stopBreathBar();
+  document.getElementById("med-start-btn").style.display = "";
+  document.getElementById("med-pause-btn").style.display = "none";
+  updateMedDisplay();
+}
+function medReset() {
+  medRunning = false;
+  clearInterval(medInterval);
+  stopBreathBar();
+  medLeft = medTotal;
+  updateMedDisplay();
+  document.getElementById("med-start-btn").style.display = "";
+  document.getElementById("med-pause-btn").style.display = "none";
+}
+function medDone() {
+  medRunning = false;
+  clearInterval(medInterval);
+  stopBreathBar();
+  medLeft = 0;
+  updateMedDisplay();
+  document.getElementById("med-phase").textContent = "Complete! 🎉";
+  document.getElementById("med-start-btn").style.display = "";
+  document.getElementById("med-pause-btn").style.display = "none";
+
+  // Beep / notification
+  try {
+    const ctx = new AudioContext();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.frequency.value = 528;   // solfeggio healing tone
+    gain.gain.setValueAtTime(0.4, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+    osc.start(); osc.stop(ctx.currentTime + 1.5);
+  } catch(e) {}
+
+  // Toast
+  const toast = document.getElementById("med-toast");
+  toast.classList.add("show");
+  setTimeout(() => toast.classList.remove("show"), 3500);
+
+  // Save session with per-session log
+  const mins   = Math.round(medTotal / 60);
+  const pts    = mins >= 20 ? 30 : 10;
+  const today  = new Date().toISOString().split("T")[0];
+  const d      = getMedData();
+  if (!d[today]) d[today] = { sessions: 0, minutes: 0, points: 0, sessionLog: [] };
+  if (!d[today].sessionLog) d[today].sessionLog = [];
+  d[today].sessions++;
+  d[today].minutes += mins;
+  d[today].points  += pts;
+  d[today].sessionLog.push(mins);  // ← store this session's actual duration
+  d._totalPts = (d._totalPts || 0) + pts;
+  saveMedData(d);
+  renderMedGraph();
+  updateMedTodayStats();
+  updateMedRewards();
+}
+function renderMedGraph() {
+  const d     = getMedData();
+  const graph = document.getElementById("med-graph");
+  if (!graph) return;
+  const days = [];
+  for (let i = 6; i >= 0; i--) {
+    const dt = new Date(); dt.setDate(dt.getDate() - i);
+    days.push(dt.toISOString().split("T")[0]);
+  }
+  const maxMins = Math.max(...days.map(day => d[day]?.minutes || 0), 1);
+  const BAR_MAX = 90;
+
+  graph.innerHTML = days.map(day => {
+    const mins    = d[day]?.minutes   || 0;
+    const sess    = d[day]?.sessions  || 0;
+    const sessLog = d[day]?.sessionLog || [];
+    const label   = new Date(day + "T12:00:00").toLocaleDateString("en",{weekday:"short"}).slice(0,3);
+    const isToday = day === new Date().toISOString().split("T")[0];
+    const barH    = mins > 0 ? Math.max(28, Math.round((mins / maxMins) * BAR_MAX)) : 5;
+
+    // No segments — just show session count badge if multiple sessions
+    const segHTML = sess > 1
+      ? `<div style="position:absolute;top:3px;right:4px;font-size:8px;font-weight:700;color:rgba(255,255,255,0.9)">${sess}×</div>`
+      : "";
+
+    return `
+    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+      <div style="font-size:9px;color:var(--accent3);font-weight:700;min-height:13px">${mins>0?mins+"m":""}</div>
+      <div style="position:relative;width:100%;height:${barH}px;border-radius:5px 5px 0 0;
+        background:linear-gradient(to top,#34D399,#6C8EFF);min-height:5px;overflow:hidden"
+        title="${label}: ${mins}min · ${sess} session${sess!==1?'s':''}">
+        ${segHTML}
+      </div>
+      <div style="font-size:9px;font-weight:${isToday?"700":"400"};color:${isToday?"var(--accent)":"var(--text3)"}">${label}</div>
+    </div>`;
+  }).join("");
+
+  updateMedTodayStats();
+  updateMedRewards();
+}
+function updateMedTodayStats() {
+  const d     = getMedData();
+  const today = new Date().toISOString().split("T")[0];
+  const t     = d[today];
+  const el    = document.getElementById("med-today-stats");
+  if (!el) return;
+  if (!t || !t.sessions) {
+    el.textContent = "No sessions yet today. Start meditating!";
+  } else {
+    el.innerHTML = `✅ <strong>${t.sessions}</strong> session${t.sessions>1?"s":""} today · <strong>${t.minutes}</strong> min total · <strong>+${t.points}</strong> pts earned`;
+  }
+}
+function updateMedRewards() {
+  const d   = getMedData();
+  const pts = d._totalPts || 0;
+  const el  = document.getElementById("med-points");
+  const bd  = document.getElementById("med-badge");
+  if (el) el.textContent = `${pts} pts`;
+  if (!bd) return;
+  if      (pts >= 500) bd.textContent = "Zen Master 🏆";
+  else if (pts >= 200) bd.textContent = "Advanced 🌳";
+  else if (pts >= 100) bd.textContent = "Practitioner 🌿";
+  else if (pts >= 30)  bd.textContent = "Explorer 🌱";
+  else                 bd.textContent = "Beginner 🌱";
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// YOGA GUIDE
+// ══════════════════════════════════════════════════════════════════════════════
+const YOGA_DATA = {
+  beginner: [
+    { name:"Mountain Pose (Tadasana)",       desc:"Stand tall, feet together, arms at sides. Grounds and centres.",      pts:5  },
+    { name:"Child's Pose (Balasana)",         desc:"Kneel, sit back on heels, fold forward, arms extended.",              pts:5  },
+    { name:"Cat-Cow (Marjaryasana)",          desc:"On all fours, alternate arching and rounding your back.",             pts:5  },
+    { name:"Downward Dog (Adho Mukha)",       desc:"Hands and feet on floor, hips raised to form an inverted V.",         pts:8  },
+    { name:"Warrior I (Virabhadrasana I)",    desc:"Lunge with back foot angled 45°, arms raised overhead.",              pts:8  },
+    { name:"Tree Pose (Vrksasana)",           desc:"Stand on one leg, other foot on inner thigh. Balance and breathe.",   pts:8  },
+    { name:"Seated Forward Fold (Paschima)", desc:"Sit with legs extended, fold forward toward feet.",                   pts:5  },
+    { name:"Corpse Pose (Savasana)",          desc:"Lie flat, eyes closed, complete relaxation. End every session here.", pts:5  },
+  ],
+  intermediate: [
+    { name:"Warrior II (Virabhadrasana II)", desc:"Wide lunge, arms extended parallel to floor, gaze forward.",          pts:10 },
+    { name:"Triangle Pose (Trikonasana)",    desc:"Wide stance, reach hand to shin or floor, other arm up.",             pts:10 },
+    { name:"Half Moon (Ardha Chandrasana)", desc:"Balance on one hand and foot, body parallel to floor.",               pts:15 },
+    { name:"Pigeon Pose (Kapotasana)",       desc:"Deep hip opener — one leg bent in front, other extended back.",       pts:12 },
+    { name:"Boat Pose (Navasana)",           desc:"Balance on sit bones, legs and torso form a V shape.",                pts:12 },
+    { name:"Bridge Pose (Setu Bandha)",      desc:"Lie on back, lift hips to the ceiling. Strengthens back.",           pts:10 },
+    { name:"Crow Pose (Bakasana)",           desc:"Balance on hands with knees on upper arms. Core strength.",           pts:15 },
+    { name:"Camel Pose (Ustrasana)",         desc:"Kneeling backbend, hands reach for heels. Opens chest.",             pts:12 },
+  ],
+  advanced: [
+    { name:"Headstand (Sirsasana)",          desc:"Supported inversion — queen of all poses. Builds strength.",         pts:25 },
+    { name:"Handstand (Adho Mukha Vrks.)",   desc:"Full arm balance against wall first. Ultimate upper body strength.", pts:30 },
+    { name:"Wheel Pose (Urdhva Dhanurasana)",desc:"Full backbend from floor, hands and feet on mat.",                  pts:20 },
+    { name:"King Pigeon (Raja Kapotasana)",  desc:"Deep backbend pigeon variant. Full spinal flexibility.",            pts:25 },
+    { name:"Firefly (Tittibhasana)",         desc:"Arm balance with legs extended forward. Core and arm power.",        pts:30 },
+    { name:"Scorpion (Vrschikasana)",        desc:"Forearm balance with deep backbend. Advanced inversion.",            pts:35 },
+    { name:"Lotus (Padmasana)",              desc:"Cross-legged seated meditation pose. Hip flexibility required.",     pts:15 },
+    { name:"Eagle (Garudasana)",             desc:"Standing wrap of arms and legs. Focus and balance.",                 pts:20 },
+  ],
+  pranayama: [
+    { name:"Belly Breathing (Diaphragmatic)", desc:"Breathe deeply into belly, expanding fully. Foundation of all pranayama.", pts:5 },
+    { name:"Alternate Nostril (Nadi Shodhana)",desc:"Close each nostril alternately. Balances left and right brain.",  pts:8 },
+    { name:"Ujjayi Breath (Ocean Breath)",    desc:"Slight constriction in throat, creates ocean sound. Calming.",     pts:8 },
+    { name:"Kapalabhati (Skull Shining)",     desc:"Rapid forceful exhales with passive inhales. Energising.",         pts:10 },
+    { name:"Box Breathing (Sama Vritti)",     desc:"Inhale 4s, hold 4s, exhale 4s, hold 4s. Reduces stress.",         pts:8 },
+    { name:"Bhramari (Humming Bee)",          desc:"Inhale, exhale with humming sound. Instant nervous system calm.",  pts:8 },
+    { name:"Anulom Vilom",                    desc:"Alternate nostril with ratio 1:2 exhale. Deep relaxation.",       pts:10 },
+    { name:"Bhastrika (Bellows Breath)",      desc:"Rapid deep inhale and exhale. Increases energy and heat.",         pts:12 },
+  ],
+};
+
+let currentYogaLevel = "beginner";
+
+function getYogaDone() {
+  try { return JSON.parse(localStorage.getItem(`mb_yoga_${CU}`) || "{}"); }
+  catch(e) { return {}; }
+}
+function saveYogaDone(d) { localStorage.setItem(`mb_yoga_${CU}`, JSON.stringify(d)); }
+
+function switchYogaLevel(level, el) {
+  document.querySelectorAll(".yoga-tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  currentYogaLevel = level;
+  renderYogaList(level);
+}
+
+function toggleYogaPose(level, idx) {
+  const d   = getYogaDone();
+  const key = `${level}_${idx}`;
+  d[key]    = !d[key];
+  saveYogaDone(d);
+  renderYogaList(level);
+}
+
+function renderYogaList(level) {
+  const poses = YOGA_DATA[level];
+  const done  = getYogaDone();
+  const list  = document.getElementById("yoga-list");
+  if (!list) return;
+
+  const doneCount  = poses.filter((_,i) => done[`${level}_${i}`]).length;
+  const totalPts   = poses.reduce((a,p,i) => a + (done[`${level}_${i}`] ? p.pts : 0), 0);
+  const pct        = Math.round((doneCount / poses.length) * 100);
+  const levelLabel = level.charAt(0).toUpperCase() + level.slice(1);
+
+  document.getElementById("yoga-level-label").textContent = `${levelLabel} Progress`;
+  document.getElementById("yoga-progress-pct").textContent = `${pct}%`;
+  document.getElementById("yoga-prog-fill").style.width    = `${pct}%`;
+  document.getElementById("yoga-done-count").textContent   = `${doneCount} / ${poses.length} poses done`;
+  document.getElementById("yoga-reward-pts").textContent   = `${totalPts} pts 🌟`;
+
+  list.innerHTML = poses.map((p, i) => {
+    const isDone = !!done[`${level}_${i}`];
+    const vidId  = `yoga-vid-${level}-${i}`;
+    return `
+    <div class="yoga-item ${isDone ? "done" : ""}" id="yitem-${level}-${i}">
+      <div style="width:100%">
+        <div style="display:flex;align-items:center;gap:12px;cursor:pointer" onclick="toggleYogaPose('${level}',${i})">
+          <div class="yoga-check">${isDone ? "✓" : ""}</div>
+          <div style="flex:1">
+            <div class="yoga-name">${p.name}</div>
+            <div class="yoga-desc">${p.desc}</div>
+          </div>
+          <div class="yoga-pts">+${p.pts} pts</div>
+          <button onclick="event.stopPropagation();toggleYogaVideo('${vidId}','${level}',${i})"
+            style="background:var(--surface2);border:1px solid var(--border2);border-radius:8px;
+            padding:5px 10px;cursor:pointer;font-size:11px;color:var(--accent);white-space:nowrap">
+            ▶ Tutorial
+          </button>
+        </div>
+        <!-- Animated Tutorial (inline SVG animation) -->
+        <div id="${vidId}" style="display:none;margin-top:12px;border-radius:10px;overflow:hidden;
+          background:var(--surface2);border:1px solid var(--border2);padding:16px;text-align:center">
+          ${buildYogaAnimation(p.name, level)}
+          <div style="font-size:11px;color:var(--text2);margin-top:10px;line-height:1.6">${p.steps || p.desc}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function toggleYogaVideo(id, level, idx) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const isOpen = el.style.display !== "none";
+  // Close all other open tutorials
+  document.querySelectorAll('[id^="yoga-vid-"]').forEach(v => v.style.display = "none");
+
+  if (!isOpen) {
+    el.style.display = "block";
+    // Start the canvas animation — find the canvas inside this panel
+    const canvas = el.querySelector("canvas[data-frames]");
+    if (canvas && !yogaAnimators[canvas.id]) {
+      try {
+        const frames = JSON.parse(canvas.getAttribute("data-frames"));
+        startYogaCanvas(canvas.id, frames);
+      } catch(e) { console.warn("yoga canvas error:", e); }
+    }
+  }
+}
+
+// Global yoga animation registry — keyed by canvas id
+const yogaAnimators = {};
+
+function yogaCtrl(id, play) {
+  const a = yogaAnimators[id];
+  if (!a) return;
+  if (play) {
+    a.run = true;
+    a.tick();
+  } else {
+    a.run = false;
+    if (a.raf) cancelAnimationFrame(a.raf);
+  }
+}
+
+function startYogaCanvas(cid, frames) {
+  requestAnimationFrame(() => {
+    const cv = document.getElementById(cid);
+    if (!cv) return;
+    const ctx = cv.getContext("2d");
+    const lbl = document.getElementById(cid + "_lbl");
+
+    const HOLD = 90, TRANS = 40;
+    // Start PAUSED — user must click Play to animate
+    const a = { run: false, fi: 0, t: 0, raf: null };
+
+    function lerp(x, y, f) { return x.map((v, i) => v + (y[i] - v) * f); }
+
+    function draw(j, label) {
+      ctx.clearRect(0, 0, 220, 250);
+      const [hx,hy,sx,sy,px,py,lex,ley,lhx,lhy,rex,rey,rhx,rhy,lkx,lky,lfx,lfy,rkx,rky,rfx,rfy] = j;
+
+      const grad = ctx.createRadialGradient(110,125,20,110,125,110);
+      grad.addColorStop(0,"rgba(108,142,255,0.07)");
+      grad.addColorStop(1,"rgba(0,0,0,0)");
+      ctx.fillStyle = grad; ctx.fillRect(0,0,220,250);
+
+      function seg(x1,y1,x2,y2,c,w,glow) {
+        if (glow) { ctx.shadowColor = c; ctx.shadowBlur = 10; }
+        ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2);
+        ctx.strokeStyle = c; ctx.lineWidth = w; ctx.lineCap = "round"; ctx.stroke();
+        ctx.shadowBlur = 0;
+      }
+      function jnt(x,y,r,c) {
+        ctx.shadowColor = c; ctx.shadowBlur = 8;
+        ctx.beginPath(); ctx.arc(x,y,r,0,6.28);
+        ctx.fillStyle = c; ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+
+      const C = { spine:"#A78BFA", arm:"#6C8EFF", leg:"#34D399", hand:"#FBBF24", foot:"#F87171" };
+      seg(sx,sy,px,py,C.spine,5,true); seg(hx,hy,sx,sy,C.spine,4,false);
+      seg(sx,sy,lex,ley,C.arm,4,true); seg(lex,ley,lhx,lhy,C.arm,3,false);
+      seg(sx,sy,rex,rey,C.arm,4,true); seg(rex,rey,rhx,rhy,C.arm,3,false);
+      seg(px,py,lkx,lky,C.leg,4,true); seg(lkx,lky,lfx,lfy,C.leg,3,false);
+      seg(px,py,rkx,rky,C.leg,4,true); seg(rkx,rky,rfx,rfy,C.leg,3,false);
+
+      ctx.shadowColor = C.spine; ctx.shadowBlur = 12;
+      ctx.beginPath(); ctx.arc(hx,hy,14,0,6.28);
+      ctx.strokeStyle = C.spine; ctx.lineWidth = 3; ctx.stroke();
+      ctx.shadowBlur = 0;
+
+      ctx.fillStyle = C.spine;
+      ctx.beginPath(); ctx.arc(hx-4,hy-3,2,0,6.28); ctx.fill();
+      ctx.beginPath(); ctx.arc(hx+4,hy-3,2,0,6.28); ctx.fill();
+      ctx.beginPath(); ctx.arc(hx,hy+3,3,0,Math.PI); ctx.stroke();
+
+      jnt(sx,sy,6,C.spine); jnt(px,py,6,C.spine);
+      jnt(lex,ley,4,C.arm); jnt(rex,rey,4,C.arm);
+      jnt(lhx,lhy,4,C.hand); jnt(rhx,rhy,4,C.hand);
+      jnt(lkx,lky,4,C.leg); jnt(rkx,rky,4,C.leg);
+      jnt(lfx,lfy,4,C.foot); jnt(rfx,rfy,4,C.foot);
+
+      const pct = (a.fi % frames.length) / frames.length;
+      ctx.fillStyle = "rgba(108,142,255,0.12)"; ctx.fillRect(0,240,220,8);
+      const barGrad = ctx.createLinearGradient(0,0,220,0);
+      barGrad.addColorStop(0,"#6C8EFF"); barGrad.addColorStop(1,"#34D399");
+      ctx.fillStyle = barGrad; ctx.fillRect(0,240,220*pct,8);
+
+      if (lbl) lbl.textContent = "Step " + (a.fi % frames.length + 1) + ": " + label;
+    }
+
+    a.tick = function() {
+      if (!a.run) return;
+      const cur = frames[a.fi % frames.length];
+      const nxt = frames[(a.fi + 1) % frames.length];
+      const prog = Math.max(0, Math.min(1, (a.t - HOLD) / TRANS));
+      const j   = a.t < HOLD ? cur.j : lerp(cur.j, nxt.j, prog);
+      const lab = a.t < HOLD ? cur.label : "↪ " + nxt.label;
+      draw(j, lab);
+      a.t++;
+      if (a.t >= HOLD + TRANS) { a.t = 0; a.fi = (a.fi + 1) % frames.length; }
+      a.raf = requestAnimationFrame(a.tick);
+    };
+
+    yogaAnimators[cid] = a;
+    // Draw first frame statically so canvas isn't blank
+    draw(frames[0].j, frames[0].label);
+    if (lbl) lbl.textContent = "Step 1: " + frames[0].label + " — press ▶ Play to animate";
+  });
+}
+
+function buildYogaAnimation(poseName, level) {
+  const name = poseName.toLowerCase();
+  const cid  = "yc_" + Math.random().toString(36).slice(2, 9);
+
+  const POSES = {
+    mountain: [
+      { label:"Stand, feet together, arms at sides",   j:[110,22,110,60,110,115,88,78,74,100,132,78,146,100,95,150,88,190,125,150,132,190] },
+      { label:"Roll shoulders back, open your chest",  j:[110,20,110,57,110,112,86,74,72,96,134,74,148,96,95,148,88,188,125,148,132,188] },
+      { label:"Inhale — grow tall from crown",         j:[110,18,110,55,110,110,86,72,72,94,134,72,148,94,95,146,88,186,125,146,132,186] },
+      { label:"Exhale — feel grounded and stable",     j:[110,20,110,57,110,112,86,74,72,96,134,74,148,96,95,148,88,188,125,148,132,188] },
+    ],
+    child: [
+      { label:"Kneel, sit back toward heels",          j:[110,88,110,104,110,120,84,108,64,115,136,108,155,115,95,132,88,150,122,132,128,150] },
+      { label:"Extend arms forward on the mat",        j:[110,100,110,112,110,122,74,112,42,114,146,112,174,114,96,134,88,152,122,134,128,152] },
+      { label:"Forehead rests on mat — breathe deep",  j:[110,108,110,116,110,124,72,112,40,112,148,112,176,112,96,134,88,152,122,134,128,152] },
+      { label:"Hold — breathe into your back",         j:[110,108,110,116,110,124,72,112,40,112,148,112,176,112,96,134,88,152,122,134,128,152] },
+    ],
+    catcow: [
+      { label:"All fours — wrists under shoulders",    j:[110,78,110,96,110,114,78,96,56,110,142,96,162,110,92,128,84,148,128,128,136,148] },
+      { label:"CAT: Exhale — round spine up",          j:[110,68,110,85,110,102,78,88,57,104,142,88,163,104,92,128,84,148,128,128,136,148] },
+      { label:"Neutral — smooth transition",           j:[110,76,110,93,110,110,78,93,56,108,142,93,162,108,92,128,84,148,128,128,136,148] },
+      { label:"COW: Inhale — belly drops, look up",    j:[110,84,110,100,110,118,76,96,54,110,144,96,164,110,92,128,84,148,128,128,136,148] },
+    ],
+    downdog: [
+      { label:"Start on all fours",                    j:[110,78,110,96,110,114,78,96,56,110,142,96,162,110,92,128,84,148,128,128,136,148] },
+      { label:"Tuck toes, lift knees off floor",       j:[110,86,110,100,110,118,76,98,56,112,144,98,164,112,94,132,86,152,126,132,134,152] },
+      { label:"Push hips HIGH — inverted V",           j:[110,52,110,72,110,100,76,76,58,92,144,76,162,92,96,136,88,168,124,136,132,168] },
+      { label:"Press heels down — hold and breathe",   j:[110,48,110,68,110,96,74,72,56,88,146,72,164,88,96,138,86,170,124,138,132,170] },
+    ],
+    warrior1: [
+      { label:"Stand tall, feet hip-width apart",      j:[110,22,110,60,110,115,88,78,74,100,132,78,146,100,95,150,88,190,125,150,132,190] },
+      { label:"Step left foot back, bend right knee",  j:[110,34,110,68,110,112,88,84,78,104,132,84,142,104,90,140,72,178,122,152,130,190] },
+      { label:"Square hips, raise both arms up",       j:[110,32,110,66,110,110,90,54,88,28,130,54,128,28,90,138,72,176,122,150,130,188] },
+      { label:"Sink deeper — gaze forward, breathe",   j:[110,34,110,68,110,114,88,52,86,25,132,52,130,25,88,140,70,178,122,152,130,190] },
+    ],
+    warrior2: [
+      { label:"Wide stance — feet 4 feet apart",       j:[110,24,110,60,110,116,88,80,76,100,132,80,144,100,72,152,60,190,148,154,158,192] },
+      { label:"Right foot turns 90° outward",          j:[110,24,110,60,110,116,88,80,76,100,132,80,144,100,70,152,58,190,150,154,160,192] },
+      { label:"Bend right knee over ankle",             j:[110,24,110,60,110,116,88,80,76,100,132,80,144,100,67,149,55,187,150,152,162,190] },
+      { label:"Arms parallel to floor — gaze right",   j:[110,24,110,60,110,116,64,60,30,60,156,60,190,60,67,149,55,187,150,152,162,190] },
+    ],
+    tree: [
+      { label:"Stand tall on both feet",               j:[110,22,110,60,110,115,88,78,74,100,132,78,146,100,95,150,88,190,125,150,132,190] },
+      { label:"Shift all weight to left foot",         j:[110,22,110,60,110,115,88,78,74,100,132,78,146,100,97,150,90,190,112,152,118,192] },
+      { label:"Right foot on left inner thigh",        j:[110,22,110,60,110,115,88,78,74,100,132,78,146,100,97,150,90,190,128,134,136,152] },
+      { label:"Hands at heart or raise overhead",      j:[110,22,110,60,110,115,90,48,90,26,130,48,130,26,97,150,90,190,128,134,136,152] },
+    ],
+    savasana: [
+      { label:"Lie flat on your back on the mat",      j:[110,120,110,132,110,145,74,132,54,136,146,132,166,136,95,154,85,174,125,154,135,174] },
+      { label:"Let arms fall away from body",          j:[110,120,110,132,110,145,68,132,48,136,152,132,172,136,95,154,85,174,125,154,135,174] },
+      { label:"Feet fall open — no effort needed",     j:[110,120,110,132,110,145,68,132,48,136,152,132,172,136,90,156,78,176,130,156,140,176] },
+      { label:"Close eyes. Complete rest. 😌",         j:[110,120,110,132,110,145,68,132,48,136,152,132,172,136,90,156,78,176,130,156,140,176] },
+    ],
+    bridge: [
+      { label:"Lie on back, knees bent, feet flat",    j:[110,120,110,132,110,145,72,132,57,136,148,132,163,136,95,155,87,174,125,155,133,174] },
+      { label:"Arms alongside body, palms down",       j:[110,118,110,130,110,143,70,128,55,132,150,128,165,132,95,148,87,168,125,148,133,168] },
+      { label:"Inhale — lift hips toward ceiling",     j:[110,96,110,110,110,128,68,120,53,130,152,120,167,130,95,138,87,158,125,138,133,158] },
+      { label:"Hold 5 breaths — squeeze glutes",       j:[110,92,110,106,110,124,67,118,52,128,153,118,168,128,94,136,86,156,126,136,134,156] },
+    ],
+    headstand: [
+      { label:"Clasp hands, forearms on mat",          j:[110,152,110,135,110,115,84,129,62,137,136,129,158,137,97,90,87,65,123,90,133,65] },
+      { label:"Crown of head on mat — gentle",         j:[110,160,110,140,110,118,82,134,60,142,138,134,160,142,97,96,87,70,123,96,133,70] },
+      { label:"Walk feet in — hips rise up",           j:[110,164,110,144,110,120,80,138,58,146,140,138,162,146,97,102,90,80,123,102,130,80] },
+      { label:"Float legs up — fully inverted",        j:[110,168,110,148,110,125,80,140,60,148,140,140,162,148,103,80,103,38,117,80,117,38] },
+    ],
+    pranayama: [
+      { label:"Sit comfortably — spine tall",          j:[110,34,110,68,110,112,86,82,68,104,134,82,152,104,92,136,87,158,128,136,133,158] },
+      { label:"Right hand in Vishnu mudra",            j:[110,34,110,68,110,112,86,82,68,104,130,76,128,56,92,136,87,158,128,136,133,158] },
+      { label:"Close right nostril — inhale left",     j:[110,34,110,68,110,112,86,82,68,104,128,72,126,50,92,136,87,158,128,136,133,158] },
+      { label:"Hold gently — exhale opposite side",    j:[110,34,110,68,110,112,86,78,68,56,128,72,126,50,92,136,87,158,128,136,133,158] },
+    ],
+  };
+
+  function getFrames(n) {
+    if (/mountain|tadasana/.test(n))                     return POSES.mountain;
+    if (/child|balasana/.test(n))                        return POSES.child;
+    if (/cat.?cow|marjary/.test(n))                      return POSES.catcow;
+    if (/downward|adho/.test(n))                         return POSES.downdog;
+    if (/warrior.*\bi\b|virabhadra.*i[^i]/.test(n))      return POSES.warrior1;
+    if (/warrior.*ii|virabhadra.*ii/.test(n))            return POSES.warrior2;
+    if (/tree|vrksa/.test(n))                            return POSES.tree;
+    if (/corpse|savasana/.test(n))                       return POSES.savasana;
+    if (/bridge|setu/.test(n))                           return POSES.bridge;
+    if (/headstand|sirsasana/.test(n))                   return POSES.headstand;
+    if (/pranayam|nadi|ujjayi|kapal|bhramari|anulom|bhastrika|box|belly/.test(n)) return POSES.pranayama;
+    return POSES.mountain;
+  }
+
+  const frames = getFrames(name);
+  const stepsHTML = frames.map((f,i)=>`
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:8px">
+      <div style="width:22px;height:22px;border-radius:50%;background:var(--accent);color:white;
+        font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;
+        flex-shrink:0">${i+1}</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6">${f.label}</div>
+    </div>`).join("");
+
+  // Encode frames as JSON in a data attribute — no inline <script> needed
+  const framesJson = JSON.stringify(frames).replace(/"/g,"&quot;");
+
+  return `
+    <div style="display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex-shrink:0;text-align:center">
+        <canvas id="${cid}" width="220" height="250"
+          data-frames="${framesJson}"
+          style="border-radius:12px;background:linear-gradient(135deg,#0d0f1a,#141728);
+          display:block;border:1px solid var(--border2)"></canvas>
+        <div style="font-size:11px;color:var(--accent);margin-top:6px;font-weight:500;min-height:16px" id="${cid}_lbl">Loading...</div>
+        <div style="display:flex;gap:6px;justify-content:center;margin-top:8px">
+          <button onclick="yogaCtrl('${cid}',false)"
+            style="padding:6px 14px;border-radius:8px;border:1px solid var(--border2);
+            background:var(--surface2);color:var(--text2);font-size:12px;cursor:pointer">⏸ Pause</button>
+          <button onclick="yogaCtrl('${cid}',true)"
+            style="padding:6px 14px;border-radius:8px;border:none;
+            background:var(--accent);color:white;font-size:12px;cursor:pointer;font-weight:600">▶ Play</button>
+        </div>
+      </div>
+      <div style="flex:1;min-width:200px;padding-top:4px">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+          color:var(--text3);margin-bottom:12px">Step-by-Step Guide</div>
+        ${stepsHTML}
+      </div>
+    </div>`;
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MOVIES — Real TMDB poster images + direct platform deep-links
+// ══════════════════════════════════════════════════════════════════════════════
+let selectedMoods = new Set(["happy"]);
+
+// TMDB poster CDN — free, no API key needed for static image URLs
+const MOVIE_POSTERS = {
+  "The Secret Life of Walter Mitty":"https://image.tmdb.org/t/p/w300/bkgdo4GIOU2D8H5ORNpfZ3LGbm5.jpg",
+  "About Time":                      "https://image.tmdb.org/t/p/w300/nv8sLMxk0TJYZKXUlZ1bAJhUWNB.jpg",
+  "The Pursuit of Happyness":        "https://image.tmdb.org/t/p/w300/lsGQQZC8HBCV7zHOJT7XvDVAGFg.jpg",
+  "Soul":                            "https://image.tmdb.org/t/p/w300/hm58Jw4Lw8OIeECIq5qyPYhAeRJ.jpg",
+  "Up":                              "https://image.tmdb.org/t/p/w300/khZpNz3U9INy7nLdN47KSIiMLuD.jpg",
+  "Forrest Gump":                    "https://image.tmdb.org/t/p/w300/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
+  "3 Idiots":                        "https://image.tmdb.org/t/p/w300/66A9MqXZyHKXkaGSnchXfnyfYsm.jpg",
+  "The Notebook":                    "https://image.tmdb.org/t/p/w300/rNzQyW4f8B8cQeg7Dgj3n6eT5k9.jpg",
+  "Crazy Rich Asians":               "https://image.tmdb.org/t/p/w300/3LDdMYwuPEoP8gVeKfK1OYHPQK4.jpg",
+  "La La Land":                      "https://image.tmdb.org/t/p/w300/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg",
+  "Pride & Prejudice":               "https://image.tmdb.org/t/p/w300/iOEn8TiRnvWL8Tm3cUqvAm3dpWP.jpg",
+  "DDLJ":                            "https://image.tmdb.org/t/p/w300/qoVFGQGBSCHHhS1MHmgFhQkW4H2.jpg",
+  "Jab We Met":                      "https://image.tmdb.org/t/p/w300/3lTpFWlTenJcNLZ6XyQW5HtXS9m.jpg",
+  "Parasite":                        "https://image.tmdb.org/t/p/w300/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg",
+  "Shutter Island":                  "https://image.tmdb.org/t/p/w300/72lpDh6CYihmjUa6cgWt9OQLDE9.jpg",
+  "Get Out":                         "https://image.tmdb.org/t/p/w300/tFXcEccSQMf3lfhfXKSU9iRBpa3.jpg",
+  "Gone Girl":                       "https://image.tmdb.org/t/p/w300/fGOtZZRtAtEzHHOElpHPDJJT1Bb.jpg",
+  "Knives Out":                      "https://image.tmdb.org/t/p/w300/pThyQovXQrw2m0s9x82twj48Jq4.jpg",
+  "The Prestige":                    "https://image.tmdb.org/t/p/w300/tRNlZbgNCFW1SHJCiGMQO8RFKbb.jpg",
+  "Memento":                         "https://image.tmdb.org/t/p/w300/yuNs09hvpHVU1cBTCAk9zxsL2oW.jpg",
+  "The Dark Knight":                 "https://image.tmdb.org/t/p/w300/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+  "Inception":                       "https://image.tmdb.org/t/p/w300/oYuLEt3zVCKq57qu2F8dT7NIa6f.jpg",
+  "Mad Max: Fury Road":              "https://image.tmdb.org/t/p/w300/8tZYtuWezp8JbcsvHYO0O46tFbo.jpg",
+  "John Wick":                       "https://image.tmdb.org/t/p/w300/fZPSd91yGE9fCcCe6OoQr6E3Bev.jpg",
+  "Baahubali 2":                     "https://image.tmdb.org/t/p/w300/rIqiMDEhxHfxLRmkefnRHxmqd20.jpg",
+  "RRR":                             "https://image.tmdb.org/t/p/w300/nEufeZa1ZM7GB3Dkm9vGQWMhE0F.jpg",
+  "Top Gun: Maverick":               "https://image.tmdb.org/t/p/w300/62HCnUTHJl6cJGAydihexg3SPMZ.jpg",
+  "Avengers: Endgame":               "https://image.tmdb.org/t/p/w300/or06FN3Dka5tukK1e9sl16pB3iy.jpg",
+  "KGF Chapter 2":                   "https://image.tmdb.org/t/p/w300/sHMbMW35HcI6ZKeBxOoJeJLDXU3.jpg",
+  "Coco":                            "https://image.tmdb.org/t/p/w300/gGEsBPAijhVUFoiNpgZXqRVWJt2.jpg",
+  "The Lion King":                   "https://image.tmdb.org/t/p/w300/sCanziIOfYMHEjhzpjN4VWZFKL.jpg",
+  "Taare Zameen Par":                "https://image.tmdb.org/t/p/w300/1pFr2OWCHQeC6KP7mIWmUCGSQyH.jpg",
+  "Finding Nemo":                    "https://image.tmdb.org/t/p/w300/eHuGQ10FUzK1mdOY69wF5pGgEf5.jpg",
+  "Schindler's List":                "https://image.tmdb.org/t/p/w300/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg",
+  "Good Will Hunting":               "https://image.tmdb.org/t/p/w300/bABCcRuvab8Eqo9UHxiEiH33j7a.jpg",
+  "Inside Out":                      "https://image.tmdb.org/t/p/w300/aAmfIX3TT40zUHGcCKrlOZRKC7u.jpg",
+  "Dangal":                          "https://image.tmdb.org/t/p/w300/1uYxBZTjsSjbVSqnMBZEHzQIYCt.jpg",
+  "Drishyam":                        "https://image.tmdb.org/t/p/w300/bq4cW3E2LmHKc1beLULrBFZTCpz.jpg",
+  "Andhadhun":                       "https://image.tmdb.org/t/p/w300/tVdpSygMKQMqv7mOjxWPWMl2V6x.jpg",
+  "Kahaani":                         "https://image.tmdb.org/t/p/w300/uRvMB2cG7lHGIoMVuYi9DpfyKhL.jpg",
+  "Hera Pheri":                      "https://image.tmdb.org/t/p/w300/7G2VvkGa9nR9lS2JLVoiWXGfpMU.jpg",
+  "12 Angry Men":                    "https://image.tmdb.org/t/p/w300/ppd84D2i9W8jXmsyInGyihiSyqz.jpg",
+  "Se7en":                           "https://image.tmdb.org/t/p/w300/69Sns8WoET6CfaYlIkHbla4l7nC.jpg",
+  "The Fault in Our Stars":          "https://image.tmdb.org/t/p/w300/3qxEPsXuQO7O5biSXEJXqTIsWGX.jpg",
+  "Life of Pi":                      "https://image.tmdb.org/t/p/w300/ydwtAnxMgEgpuLDRqWVqw3GN4Fv.jpg",
+  "The Sixth Sense":                 "https://image.tmdb.org/t/p/w300/5VCMiHnzQ9eIOnfBHDYhFI2H6Wj.jpg",
+  "Gladiator":                       "https://image.tmdb.org/t/p/w300/6WBIzCgmDCYrqh64yDREGeDk9d3.jpg",
+  // ── Previously missing posters ──────────────────────────────────────────
+  "Grave of the Fireflies":          "https://image.tmdb.org/t/p/w300/k5TmtFqFRrFnuRbBr0Pn70Rz0HT.jpg",
+  "Room":                            "https://image.tmdb.org/t/p/w300/gOdaZ2GRpDWtk8UaOQ1dkBFIgzG.jpg",
+  "A Beautiful Mind":                "https://image.tmdb.org/t/p/w300/2WXopFnBRfQnCzH7wEI9CoPGOrC.jpg",
+  "Devdas (2002)":                   "https://image.tmdb.org/t/p/w300/rDeGaH4tFjFqSOUgJNtHU5fGrHa.jpg",
+  "Kapoor & Sons":                   "https://image.tmdb.org/t/p/w300/7GqHMiCi5YoMSH2CMdXBYWjBPKO.jpg",
+  "Marley & Me":                     "https://image.tmdb.org/t/p/w300/wfNKGvHSWJNS8W3BZCpDfLq6E7R.jpg",
+  "The Grand Budapest Hotel":        "https://image.tmdb.org/t/p/w300/eWdyYQreja6JiT2n6wmvJstkoob.jpg",
+  "Superbad":                        "https://image.tmdb.org/t/p/w300/ek8e8txUyUwd2BNqj6lFEerMdnk.jpg",
+  "Andaz Apna Apna":                 "https://image.tmdb.org/t/p/w300/5LdGr01PGRmrg6Hh3LYPGlMSWQl.jpg",
+  "Game Night":                      "https://image.tmdb.org/t/p/w300/jiK9C2yoSNSQK3JTmZFM2J80GK5.jpg",
+  "The Nice Guys":                   "https://image.tmdb.org/t/p/w300/xBbo8c5B71Nqoo5C7AbnTwdSp8r.jpg",
+  "The Hangover":                    "https://image.tmdb.org/t/p/w300/uluhlXubGu1VxU63X9VHCLWDAYP.jpg",
+  "Golmaal":                         "https://image.tmdb.org/t/p/w300/6Wcy1K4Px5CmBxFrg5gDFCRTCUG.jpg",
+  "Dumb & Dumber":                   "https://image.tmdb.org/t/p/w300/nkHDIVMNPjMNPBAnV2lhLmTbmAo.jpg",
+  "What We Do in the Shadows":       "https://image.tmdb.org/t/p/w300/7MBJbpqFB85bKK0g5IjKLDEToMu.jpg",
+  "Panchayat":                       "https://image.tmdb.org/t/p/w300/p5iObMj0w6kWfMoS3M2OGD22W4S.jpg",
+  "Wonder":                          "https://image.tmdb.org/t/p/w300/jDCbKiF8VVFwJQo5CqrVU3xeAzv.jpg",
+  "Home Alone":                      "https://image.tmdb.org/t/p/w300/onTSipZ8R3bliBdKfPtsDrmhaCS.jpg",
+  "The Incredibles":                 "https://image.tmdb.org/t/p/w300/2LqaLgk4Z226KkgPJuiOQ58ShKDI.jpg",
+  "Hachi: A Dog's Tale":             "https://image.tmdb.org/t/p/w300/wfNKGvHSWJNS8W3BZCpDfLq6E7R.jpg",
+  "Chillar Party":                   "https://image.tmdb.org/t/p/w300/kU7HPnfC0UxBfUCWDHbQrpLMhwM.jpg",
+  "My Neighbor Totoro":              "https://image.tmdb.org/t/p/w300/rtGDOeG9LzoerkDGZF9dnVeLppL.jpg",
+  "Matilda":                         "https://image.tmdb.org/t/p/w300/ihBsLkRxuFqF01LF0b5dLJh1LcG.jpg",
+  "A Quiet Place":                   "https://image.tmdb.org/t/p/w300/nAU74GmpUk7t5iklEp3bufwDq4n.jpg",
+  "Vikram Vedha":                    "https://image.tmdb.org/t/p/w300/7Ep8CVOPB2vgSvfR4MvMPJBd6hG.jpg",
+  "No Country for Old Men":          "https://image.tmdb.org/t/p/w300/c430PoOolPRGqFz1mhOFGwG49OM.jpg",
+  "Prisoners":                       "https://image.tmdb.org/t/p/w300/dHJfmAkPz0hX6Tg0s5nfKp1WFFC.jpg",
+  "Oldboy":                          "https://image.tmdb.org/t/p/w300/pWDtjs568ZfOTMm5JDIWwQ2T1qK.jpg",
+  "Talaash":                         "https://image.tmdb.org/t/p/w300/a6OuMloAXNYbU0LhCFqkP4UPwb5.jpg",
+  "Zodiac":                          "https://image.tmdb.org/t/p/w300/kRsNHGFFMCwRWM3ZEW9dUjbBLkb.jpg",
+  "Drishyam 2":                      "https://image.tmdb.org/t/p/w300/tH3BNHZ1MiW7HhOuJWJlmEFibr1.jpg",
+  "Black":                           "https://image.tmdb.org/t/p/w300/6S9CPeHmxEXbCEEpHk5kzTj2Xjp.jpg",
+  "Before Sunrise":                  "https://image.tmdb.org/t/p/w300/97MTUmEcxjSXaFeIJNzBaTCOBSV.jpg",
+  "Titanic":                         "https://image.tmdb.org/t/p/w300/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
+  "Eternal Sunshine of the Spotless Mind": "https://image.tmdb.org/t/p/w300/5MwkWH9tYHv3mV9OdYTMR5qreIz.jpg",
+  "Her":                             "https://image.tmdb.org/t/p/w300/sPFBBQHBmmyOPMVBdioB6MnHv3O.jpg",
+  "Vinnaithaandi Varuvaaya":         "https://image.tmdb.org/t/p/w300/eBBfvsqcLGblpFz9TbNEioH2S4A.jpg",
+  "Rockstar":                        "https://image.tmdb.org/t/p/w300/bmpiqQn3bGUm6nTT0B2dMNhMM2K.jpg",
+  "Chef":                            "https://image.tmdb.org/t/p/w300/1ch8j6bSMCHfPqtMzBOOlrMHBxE.jpg",
+  "The Intern":                      "https://image.tmdb.org/t/p/w300/nlxPnkZY0oRUvGYmCWfgGfKAiFJ.jpg",
+  "Yes Man":                         "https://image.tmdb.org/t/p/w300/5GdGsxpD4TWvZ5WBBt1FArb3PYe.jpg",
+  "Paddington":                      "https://image.tmdb.org/t/p/w300/gZvgaKVpAIIGb3kWBHVfr3VtqBD.jpg",
+  "Julie & Julia":                   "https://image.tmdb.org/t/p/w300/gEVFOvmvtfhfQ7o7jK3YmpqFP6m.jpg",
+  "The Dark Knight":                 "https://image.tmdb.org/t/p/w300/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
+  "Mission Impossible: Fallout":     "https://image.tmdb.org/t/p/w300/AkJQpZp9WoNdj7pLYSj1L0RcMMN.jpg",
+  "War":                             "https://image.tmdb.org/t/p/w300/oLIBUkBJ4UrXBzBtbQcFdWMBGDh.jpg",
+  "Grave of the Fireflies":          "https://image.tmdb.org/t/p/w300/k5TmtFqFRrFnuRbBr0Pn70Rz0HT.jpg",
+  "Rear Window":                     "https://image.tmdb.org/t/p/w300/ILVF0eIP6M5B5aGaVPKKrTeeFB.jpg",
+};
+
+// Direct deep-links: movie title → platform → direct watch URL
+const STREAMING_LINKS = {
+  "The Pursuit of Happyness": { Netflix:"https://www.netflix.com/title/70044605", "Prime Video":"https://www.primevideo.com/detail/0GY0WFPLQKF0RL3J44YRSCXQ44" },
+  "Forrest Gump":   { Netflix:"https://www.netflix.com/title/60036612" },
+  "Parasite":       { Netflix:"https://www.netflix.com/title/81177716", "Prime Video":"https://www.primevideo.com/detail/0JKXPY6BNUHVXI7Y3EXDMJMOCM" },
+  "Shutter Island": { Netflix:"https://www.netflix.com/title/70128074", "Prime Video":"https://www.primevideo.com/detail/0GEA4XHGIJVVPEXHNBFNTC5IZ1" },
+  "Gone Girl":      { Netflix:"https://www.netflix.com/title/70299043" },
+  "Inception":      { Netflix:"https://www.netflix.com/title/70131314", "Prime Video":"https://www.primevideo.com/detail/0H3MER5OWJ4JLRJR6YO2C9I3J0" },
+  "The Dark Knight":{ Netflix:"https://www.netflix.com/title/70079016" },
+  "3 Idiots":       { Netflix:"https://www.netflix.com/title/70136153", "Prime Video":"https://www.primevideo.com/detail/0JLBV7Y8DXNFKZF5SXNKK1LIM" },
+  "Dangal":         { Netflix:"https://www.netflix.com/title/80117660", Hotstar:"https://www.hotstar.com/in/movies/dangal/1000141683" },
+  "Drishyam":       { Netflix:"https://www.netflix.com/title/80049714" },
+  "Andhadhun":      { Netflix:"https://www.netflix.com/title/81095175" },
+  "RRR":            { Netflix:"https://www.netflix.com/title/81462211" },
+  "Baahubali 2":    { Netflix:"https://www.netflix.com/title/80174469" },
+  "KGF Chapter 2":  { Netflix:"https://www.netflix.com/title/81484332" },
+  "Soul":           { "Disney+":"https://www.disneyplus.com/movies/soul/56P3lBEtBXit", Hotstar:"https://www.hotstar.com/in/movies/soul/1260009273" },
+  "Up":             { "Disney+":"https://www.disneyplus.com/movies/up/6Gd7JYFMBzqd", Hotstar:"https://www.hotstar.com/in/movies/up/1260009248" },
+  "Coco":           { "Disney+":"https://www.disneyplus.com/movies/coco/db9orsI51O3p" },
+  "Inside Out":     { "Disney+":"https://www.disneyplus.com/movies/inside-out/12LHmE7CQZM4" },
+  "Finding Nemo":   { "Disney+":"https://www.disneyplus.com/movies/finding-nemo/6MBwDSKRW1Ow" },
+  "The Lion King":  { "Disney+":"https://www.disneyplus.com/movies/the-lion-king/1nHBJkdLGJHV" },
+  "Avengers: Endgame":{ Hotstar:"https://www.hotstar.com/in/movies/avengers-endgame/1260000403", "Disney+":"https://www.disneyplus.com/movies/avengers-endgame/1T5BWGXDCVbn" },
+  "Top Gun: Maverick":{ Hotstar:"https://www.hotstar.com/in/movies/top-gun-maverick/1260093811" },
+};
+
+const STREAMING_COLORS = {
+  Netflix:"#E50914", "Prime Video":"#00A8E1", "Disney+":"#113CCF",
+  Hotstar:"#1F80E0", "Apple TV+":"#555555", YouTube:"#FF0000",
+};
+
+function getWatchLink(platform, title) {
+  const direct = (STREAMING_LINKS[title] || {})[platform];
+  if (direct) return direct;
+  const enc = encodeURIComponent(title);
+  if (platform === "Netflix")      return `https://www.netflix.com/search?q=${enc}`;
+  if (platform === "Prime Video")  return `https://www.primevideo.com/search/ref=atv_sr_sug?phrase=${enc}`;
+  if (platform === "Disney+")      return `https://www.disneyplus.com/search?q=${enc}`;
+  if (platform === "Hotstar")      return `https://www.hotstar.com/in/search?q=${enc}`;
+  if (platform === "Apple TV+")    return `https://tv.apple.com/search?term=${enc}`;
+  return `https://www.youtube.com/results?search_query=${enc}+full+movie`;
+}
+
+function getPoster(title, emoji) {
+  const url = MOVIE_POSTERS[title];
+  if (url) return `<img src="${url}" alt="${title}" loading="lazy"
+    style="width:100%;height:200px;object-fit:cover;display:block"
+    onerror="this.style.display='none';this.nextSibling.style.display='flex'">
+    <div style="display:none;width:100%;height:200px;background:linear-gradient(135deg,var(--surface2),var(--surface3));
+      align-items:center;justify-content:center;font-size:48px">${emoji}</div>`;
+  return `<div style="width:100%;height:200px;background:linear-gradient(135deg,var(--surface2),var(--surface3));
+    display:flex;align-items:center;justify-content:center;font-size:48px">${emoji}</div>`;
+}
+
+function getStars(r){return'⭐'.repeat(Math.floor(r/2))+' '+r+'/10';}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MOVIE DATABASE — restored (was accidentally dropped in a previous edit)
+// ══════════════════════════════════════════════════════════════════════════════
+const MOVIE_DB = {
+  happy: [
+    { title:"The Secret Life of Walter Mitty", year:2013, genre:"Adventure/Drama",     rating:7.3, desc:"A daydreamer embarks on a real adventure across the globe.",              streaming:["Netflix","Prime Video"],   emoji:"🌍" },
+    { title:"About Time",                       year:2013, genre:"Romance/Fantasy",     rating:7.8, desc:"A man can time-travel and uses it to find love and happiness.",           streaming:["Netflix","Prime Video"],   emoji:"⏰" },
+    { title:"The Pursuit of Happyness",         year:2006, genre:"Drama/Biography",     rating:8.0, desc:"A struggling salesman fights to turn his life around for his son.",       streaming:["Netflix","Prime Video"],   emoji:"💼" },
+    { title:"Soul",                             year:2020, genre:"Animation/Fantasy",   rating:8.1, desc:"A jazz musician explores what makes life truly worth living.",             streaming:["Disney+","Hotstar"],       emoji:"🎷" },
+    { title:"Up",                               year:2009, genre:"Animation/Adventure", rating:8.3, desc:"A widower ties balloons to his house and flies to South America.",        streaming:["Disney+","Hotstar"],       emoji:"🎈" },
+    { title:"3 Idiots",                         year:2009, genre:"Bollywood/Comedy",    rating:8.4, desc:"Three engineering students challenge the education system.",              streaming:["Netflix","Hotstar"],       emoji:"🎓" },
+    { title:"Chef",                             year:2014, genre:"Comedy/Drama",        rating:7.3, desc:"A chef quits to start a food truck and reconnects with his son.",         streaming:["Netflix","Prime Video"],   emoji:"🚚" },
+    { title:"The Intern",                       year:2015, genre:"Comedy/Drama",        rating:7.1, desc:"A 70-year-old intern works at a fashion startup.",                       streaming:["Prime Video","Netflix"],   emoji:"👔" },
+    { title:"Forrest Gump",                     year:1994, genre:"Drama/Romance",       rating:8.8, desc:"A slow-witted man witnesses and influences decades of history.",          streaming:["Netflix","Prime Video"],   emoji:"🏃" },
+    { title:"Yes Man",                          year:2008, genre:"Comedy/Romance",      rating:6.8, desc:"A man challenges himself to say yes to everything for a year.",           streaming:["Netflix","Prime Video"],   emoji:"✅" },
+    { title:"Paddington",                       year:2014, genre:"Family/Comedy",       rating:7.3, desc:"A young bear from Peru travels to London seeking a home.",               streaming:["Netflix","Prime Video"],   emoji:"🐻" },
+    { title:"Julie & Julia",                    year:2009, genre:"Comedy/Drama",        rating:7.0, desc:"Two women connect across time through the love of cooking.",             streaming:["Prime Video"],             emoji:"🍳" },
+  ],
+  romantic: [
+    { title:"The Notebook",                     year:2004, genre:"Romance/Drama",       rating:7.8, desc:"A poor man falls for a rich woman in 1940s South Carolina.",             streaming:["Netflix","Prime Video"],   emoji:"💌" },
+    { title:"La La Land",                       year:2016, genre:"Musical/Romance",     rating:8.0, desc:"A jazz musician and aspiring actress fall in love in Los Angeles.",       streaming:["Netflix","Prime Video"],   emoji:"🌟" },
+    { title:"Crazy Rich Asians",                year:2018, genre:"Romance/Comedy",      rating:6.9, desc:"A New Yorker discovers her boyfriend is from an ultra-rich family.",      streaming:["Netflix","Prime Video"],   emoji:"💎" },
+    { title:"Pride & Prejudice",                year:2005, genre:"Romance/Period",      rating:7.8, desc:"Sparks fly between Elizabeth Bennet and Mr. Darcy.",                    streaming:["Netflix","Prime Video"],   emoji:"📖" },
+    { title:"DDLJ",                             year:1995, genre:"Bollywood/Romance",   rating:8.1, desc:"Two Indians meet in Europe — a timeless Bollywood love story.",          streaming:["Netflix","Prime Video"],   emoji:"🌹" },
+    { title:"Jab We Met",                       year:2007, genre:"Bollywood/Romance",   rating:7.9, desc:"An unlikely journey leads to an unexpected love story.",                 streaming:["Netflix","Prime Video"],   emoji:"🚂" },
+    { title:"Before Sunrise",                   year:1995, genre:"Romance/Drama",       rating:8.1, desc:"Two strangers meet on a train and spend one night in Vienna.",           streaming:["Prime Video"],             emoji:"🌅" },
+    { title:"Titanic",                          year:1997, genre:"Romance/Drama",       rating:7.9, desc:"Jack and Rose's love story aboard the ill-fated RMS Titanic.",           streaming:["Netflix","Prime Video"],   emoji:"🚢" },
+    { title:"Eternal Sunshine of the Spotless Mind",year:2004,genre:"Romance/Sci-Fi",  rating:8.3, desc:"A couple erases each other from their memories but love persists.",      streaming:["Netflix","Prime Video"],   emoji:"🧠" },
+    { title:"Her",                              year:2013, genre:"Romance/Sci-Fi",      rating:8.0, desc:"A man falls in love with an AI operating system.",                       streaming:["Netflix","Prime Video"],   emoji:"💻" },
+    { title:"Vinnaithaandi Varuvaaya",          year:2010, genre:"Tamil/Romance",       rating:8.0, desc:"A man pursues a conservative girl — a timeless Tamil love story.",       streaming:["Prime Video","Hotstar"],   emoji:"🎵" },
+    { title:"Rockstar",                         year:2011, genre:"Bollywood/Romance",   rating:7.9, desc:"A musician's rise and turbulent love story told through music.",         streaming:["Netflix","Prime Video"],   emoji:"🎸" },
+  ],
+  comedy: [
+    { title:"The Grand Budapest Hotel",         year:2014, genre:"Comedy/Adventure",    rating:8.1, desc:"The adventures of a legendary concierge and his lobby boy.",             streaming:["Prime Video","Netflix"],   emoji:"🏨" },
+    { title:"Hera Pheri",                       year:2000, genre:"Bollywood/Comedy",    rating:8.2, desc:"Three broke men accidentally get caught up in a kidnapping.",            streaming:["Prime Video","Hotstar"],   emoji:"😆" },
+    { title:"Andaz Apna Apna",                  year:1994, genre:"Bollywood/Comedy",    rating:7.8, desc:"Two slackers compete to woo a rich heiress. Cult classic.",             streaming:["Prime Video"],             emoji:"🤣" },
+    { title:"Superbad",                         year:2007, genre:"Teen Comedy",         rating:7.6, desc:"Two best friends attempt to buy alcohol for a party before college.",    streaming:["Netflix","Prime Video"],   emoji:"😂" },
+    { title:"3 Idiots",                         year:2009, genre:"Bollywood/Comedy",    rating:8.4, desc:"Three friends at an engineering college challenge the system.",          streaming:["Netflix","Hotstar"],       emoji:"🎓" },
+    { title:"Game Night",                       year:2018, genre:"Action/Comedy",       rating:7.0, desc:"A game night turns into a real kidnapping mystery.",                    streaming:["Netflix","Prime Video"],   emoji:"🎲" },
+    { title:"The Nice Guys",                    year:2016, genre:"Action/Comedy",       rating:7.9, desc:"A mismatched pair of detectives investigate a girl's disappearance.",   streaming:["Netflix","Prime Video"],   emoji:"🕵️" },
+    { title:"Panchayat",                        year:2020, genre:"Indian Web Series",   rating:8.9, desc:"A city graduate serves as secretary in a remote village.",              streaming:["Prime Video"],             emoji:"🏘️" },
+    { title:"The Hangover",                     year:2009, genre:"Comedy",              rating:7.7, desc:"Three friends wake up with no memory of a bachelor night in Vegas.",     streaming:["Netflix","Prime Video"],   emoji:"🎰" },
+    { title:"Golmaal",                          year:2006, genre:"Bollywood/Comedy",    rating:7.5, desc:"A group of misfit friends get into hilarious trouble together.",         streaming:["Netflix","Hotstar"],       emoji:"😁" },
+    { title:"Dumb & Dumber",                    year:1994, genre:"Slapstick Comedy",    rating:7.3, desc:"Two dimwitted pals travel across America to return a briefcase.",        streaming:["Netflix","Prime Video"],   emoji:"🚗" },
+    { title:"What We Do in the Shadows",        year:2014, genre:"Horror/Comedy",       rating:7.7, desc:"A mockumentary about vampire flatmates in New Zealand.",                streaming:["Prime Video","Disney+"],   emoji:"🧛" },
+  ],
+  family: [
+    { title:"Coco",                             year:2017, genre:"Animation/Family",    rating:8.4, desc:"A boy accidentally lands in the Land of the Dead on Día de Muertos.",  streaming:["Disney+","Hotstar"],       emoji:"💀" },
+    { title:"The Lion King",                    year:1994, genre:"Animation/Classic",   rating:8.5, desc:"A young lion prince flees and learns to reclaim his kingdom.",          streaming:["Disney+","Hotstar"],       emoji:"🦁" },
+    { title:"Taare Zameen Par",                 year:2007, genre:"Bollywood/Drama",     rating:8.4, desc:"A dyslexic boy finds his potential through a caring teacher.",           streaming:["Netflix","Prime Video"],   emoji:"🌟" },
+    { title:"Wonder",                           year:2017, genre:"Drama/Family",        rating:7.9, desc:"A boy with a facial difference attends school for the first time.",    streaming:["Netflix","Prime Video"],   emoji:"⭐" },
+    { title:"Finding Nemo",                     year:2003, genre:"Animation/Adventure", rating:8.2, desc:"A clownfish travels the ocean to find his missing son.",               streaming:["Disney+","Hotstar"],       emoji:"🐠" },
+    { title:"Home Alone",                       year:1990, genre:"Comedy/Family",       rating:7.7, desc:"An 8-year-old left behind outwits two bumbling burglars.",              streaming:["Disney+","Hotstar"],       emoji:"🏠" },
+    { title:"The Incredibles",                  year:2004, genre:"Animation/Action",    rating:8.0, desc:"A family of superheroes tries to live a quiet suburban life.",          streaming:["Disney+","Hotstar"],       emoji:"🦸" },
+    { title:"Hachi: A Dog's Tale",              year:2009, genre:"Drama/Family",        rating:8.1, desc:"A dog's incredible story of loyalty and devotion to his owner.",        streaming:["Prime Video","Netflix"],   emoji:"🐕" },
+    { title:"Chillar Party",                    year:2011, genre:"Bollywood/Family",    rating:8.1, desc:"A group of children fight to save a stray dog in their colony.",       streaming:["Netflix"],                 emoji:"🎪" },
+    { title:"My Neighbor Totoro",               year:1988, genre:"Animation/Fantasy",   rating:8.2, desc:"Two girls move to the countryside and meet friendly forest spirits.",   streaming:["Netflix"],                 emoji:"🌳" },
+    { title:"Up",                               year:2009, genre:"Animation/Adventure", rating:8.3, desc:"A widower ties balloons to his house and flies to South America.",     streaming:["Disney+","Hotstar"],       emoji:"🎈" },
+    { title:"Matilda",                          year:1996, genre:"Family/Fantasy",      rating:7.0, desc:"A brilliant girl uses telekinesis to stand up to her oppressors.",     streaming:["Netflix"],                 emoji:"📚" },
+  ],
+  thriller: [
+    { title:"Gone Girl",                        year:2014, genre:"Psychological Thriller",rating:8.1, desc:"A husband becomes prime suspect when his wife mysteriously vanishes.", streaming:["Netflix","Prime Video"],  emoji:"🔪" },
+    { title:"Parasite",                         year:2019, genre:"Thriller/Dark Comedy", rating:8.5, desc:"A poor family schemes their way into a wealthy household.",            streaming:["Prime Video","Netflix"],   emoji:"🏠" },
+    { title:"Shutter Island",                   year:2010, genre:"Psychological Thriller",rating:8.2, desc:"A US Marshal investigates a psychiatric facility on an island.",      streaming:["Netflix","Prime Video"],   emoji:"🏝️" },
+    { title:"Get Out",                          year:2017, genre:"Horror Thriller",      rating:7.7, desc:"A Black man visits his girlfriend's family with deeply unsettling results.", streaming:["Prime Video","Netflix"],emoji:"😱" },
+    { title:"A Quiet Place",                    year:2018, genre:"Sci-Fi Thriller",      rating:7.5, desc:"A family must live in silence to avoid creatures that hunt by sound.", streaming:["Prime Video","Hotstar"],   emoji:"🔇" },
+    { title:"Drishyam",                         year:2015, genre:"Indian Thriller",      rating:8.3, desc:"A man goes to extreme lengths to protect his family from the police.", streaming:["Netflix","Prime Video"],   emoji:"📺" },
+    { title:"Andhadhun",                        year:2018, genre:"Indian Thriller",      rating:8.3, desc:"A blind pianist accidentally witnesses a murder in this dark thriller.",streaming:["Netflix","Prime Video"],   emoji:"🎹" },
+    { title:"No Country for Old Men",           year:2007, genre:"Crime Thriller",       rating:8.2, desc:"A hunter discovers $2M from a drug deal gone wrong and is pursued.",  streaming:["Netflix","Prime Video"],   emoji:"💰" },
+    { title:"Prisoners",                        year:2013, genre:"Crime Thriller",       rating:8.1, desc:"A father takes matters into his own hands when his daughter is kidnapped.", streaming:["Prime Video","Netflix"],emoji:"🔦" },
+    { title:"Vikram Vedha",                     year:2022, genre:"Indian Thriller",      rating:7.6, desc:"A gangster narrates moral stories to an upright police officer.",      streaming:["Prime Video","Netflix"],   emoji:"⚔️" },
+    { title:"Se7en",                            year:1995, genre:"Crime Thriller",       rating:8.6, desc:"Two detectives hunt a serial killer using the seven deadly sins.",     streaming:["Netflix","Prime Video"],   emoji:"📦" },
+    { title:"Oldboy",                           year:2003, genre:"Korean Thriller",      rating:8.4, desc:"A man imprisoned for 15 years hunts for his captor.",                 streaming:["Netflix","Prime Video"],   emoji:"🔒" },
+  ],
+  suspense: [
+    { title:"Knives Out",                       year:2019, genre:"Mystery/Comedy",       rating:7.9, desc:"A detective investigates the death of a crime novelist's patriarch.",  streaming:["Netflix","Prime Video"],   emoji:"🔍" },
+    { title:"The Prestige",                     year:2006, genre:"Mystery/Drama",        rating:8.5, desc:"Two rival magicians descend into obsession and danger.",               streaming:["Netflix","Prime Video"],   emoji:"🎩" },
+    { title:"Memento",                          year:2000, genre:"Neo-noir Mystery",     rating:8.4, desc:"A man with short-term memory loss hunts his wife's killer.",           streaming:["Prime Video","Netflix"],   emoji:"🧩" },
+    { title:"Rear Window",                      year:1954, genre:"Hitchcock Classic",    rating:8.5, desc:"A wheelchair-bound photographer spies on his neighbours.",             streaming:["Prime Video","Apple TV+"], emoji:"🪟" },
+    { title:"Kahaani",                          year:2012, genre:"Indian Mystery",       rating:8.1, desc:"A pregnant woman searches for her missing husband in Kolkata.",        streaming:["Prime Video","Netflix"],   emoji:"🗺️" },
+    { title:"Talaash",                          year:2012, genre:"Indian Mystery",       rating:7.5, desc:"A cop investigating a Bollywood star's death uncovers a mystery.",     streaming:["Netflix","Prime Video"],   emoji:"🌙" },
+    { title:"The Sixth Sense",                  year:1999, genre:"Supernatural Mystery", rating:8.2, desc:"A child psychologist works with a boy who sees dead people.",         streaming:["Netflix","Prime Video"],   emoji:"👻" },
+    { title:"Zodiac",                           year:2007, genre:"Crime/Mystery",        rating:7.7, desc:"Journalists investigate the real-life Zodiac killer case.",            streaming:["Prime Video","Netflix"],   emoji:"♊" },
+    { title:"Drishyam 2",                       year:2022, genre:"Indian Mystery",       rating:8.3, desc:"Seven years later, the truth still threatens to unravel.",             streaming:["Prime Video"],             emoji:"📹" },
+    { title:"12 Angry Men",                     year:1957, genre:"Classic Mystery",      rating:9.0, desc:"12 jurors must reach a unanimous verdict in a murder case.",           streaming:["Prime Video","YouTube"],   emoji:"⚖️" },
+    { title:"Oldboy",                           year:2003, genre:"Korean Thriller",      rating:8.4, desc:"A man imprisoned for 15 years hunts for his captor.",                 streaming:["Netflix","Prime Video"],   emoji:"🔒" },
+    { title:"Black",                            year:2005, genre:"Indian Drama/Mystery", rating:8.1, desc:"A deaf-blind girl's journey and her dedicated teacher.",              streaming:["Prime Video","Netflix"],   emoji:"🕶️" },
+  ],
+  sad: [
+    { title:"The Fault in Our Stars",           year:2014, genre:"Romance/Drama",        rating:7.7, desc:"Two teenagers with cancer fall in love.",                             streaming:["Netflix","Prime Video"],   emoji:"💔" },
+    { title:"Schindler's List",                 year:1993, genre:"Historical Drama",     rating:9.0, desc:"A businessman saves over a thousand Jewish lives during the Holocaust.", streaming:["Prime Video","Netflix"], emoji:"🕯️" },
+    { title:"Inside Out",                       year:2015, genre:"Animation/Drama",      rating:8.2, desc:"A girl's emotions guide her through a difficult life change.",        streaming:["Disney+","Hotstar"],       emoji:"😭" },
+    { title:"Good Will Hunting",                year:1997, genre:"Drama",                rating:8.3, desc:"A janitor genius must choose between his talent and his past.",       streaming:["Netflix","Prime Video"],   emoji:"📚" },
+    { title:"Life of Pi",                       year:2012, genre:"Drama/Adventure",      rating:7.9, desc:"A boy survives a shipwreck stranded with a Bengal tiger.",            streaming:["Disney+","Hotstar"],       emoji:"🐯" },
+    { title:"Grave of the Fireflies",           year:1988, genre:"Animation/War",        rating:8.5, desc:"Two siblings struggle to survive in Japan during WWII.",              streaming:["Netflix"],                 emoji:"🔥" },
+    { title:"Dangal",                           year:2016, genre:"Bollywood/Drama",      rating:8.4, desc:"A wrestler trains his daughters to become world-class champions.",    streaming:["Netflix","Hotstar"],       emoji:"🥇" },
+    { title:"Room",                             year:2015, genre:"Drama/Thriller",       rating:8.1, desc:"A mother and son survive captivity and slowly re-enter the world.",  streaming:["Netflix","Prime Video"],   emoji:"🚪" },
+    { title:"A Beautiful Mind",                 year:2001, genre:"Biography/Drama",      rating:8.2, desc:"A Nobel Prize-winning mathematician's battle with schizophrenia.",    streaming:["Netflix","Prime Video"],   emoji:"🧮" },
+    { title:"Devdas (2002)",                    year:2002, genre:"Bollywood/Tragedy",    rating:7.4, desc:"A man drinks himself to destruction after losing his love.",          streaming:["Prime Video","YouTube"],   emoji:"🥀" },
+    { title:"Kapoor & Sons",                    year:2016, genre:"Bollywood/Drama",      rating:7.7, desc:"A dysfunctional family gathers when their grandfather falls ill.",    streaming:["Netflix","Prime Video"],   emoji:"👨‍👩‍👦" },
+    { title:"Marley & Me",                      year:2008, genre:"Family/Drama",         rating:7.1, desc:"A family grows around their wild, lovable dog.",                      streaming:["Disney+","Prime Video"],   emoji:"🐶" },
+  ],
+  action: [
+    { title:"Mad Max: Fury Road",               year:2015, genre:"Action/Sci-Fi",        rating:8.1, desc:"A woman and a fugitive escape a warlord across a post-apocalyptic wasteland.", streaming:["Netflix","Prime Video"],emoji:"🚗" },
+    { title:"John Wick",                        year:2014, genre:"Action/Thriller",      rating:7.4, desc:"An ex-hitman comes out of retirement to avenge his puppy.",           streaming:["Netflix","Prime Video"],   emoji:"🐶" },
+    { title:"Baahubali 2",                      year:2017, genre:"Indian Epic/Action",   rating:8.2, desc:"The king's son fights to reclaim his rightful throne.",               streaming:["Netflix","Prime Video"],   emoji:"⚔️" },
+    { title:"RRR",                              year:2022, genre:"Indian Action/Epic",   rating:7.8, desc:"Two legendary freedom fighters share an unlikely bond.",              streaming:["Netflix","Prime Video"],   emoji:"🔥" },
+    { title:"Top Gun: Maverick",                year:2022, genre:"Action/Drama",         rating:8.3, desc:"Maverick returns to train Top Gun graduates for an impossible mission.", streaming:["Prime Video","Hotstar"],emoji:"✈️" },
+    { title:"The Dark Knight",                  year:2008, genre:"Superhero Thriller",   rating:9.0, desc:"Batman faces the Joker, who plunges Gotham into chaos.",              streaming:["Netflix","Prime Video"],   emoji:"🦇" },
+    { title:"Avengers: Endgame",                year:2019, genre:"Superhero/Action",     rating:8.4, desc:"The Avengers assemble to reverse Thanos's devastating actions.",      streaming:["Disney+","Hotstar"],       emoji:"🦸" },
+    { title:"KGF Chapter 2",                    year:2022, genre:"Indian Action",        rating:8.2, desc:"Rocky rules the gold mines and faces his most powerful enemies.",     streaming:["Netflix","Prime Video"],   emoji:"💎" },
+    { title:"Gladiator",                        year:2000, genre:"Action/Drama",         rating:8.5, desc:"A Roman general enslaved by corrupt power fights for his family.",    streaming:["Netflix","Prime Video"],   emoji:"🏛️" },
+    { title:"Inception",                        year:2010, genre:"Action/Sci-Fi",        rating:8.8, desc:"A thief who steals secrets from dreams must plant an idea instead.", streaming:["Netflix","Prime Video"],   emoji:"🌀" },
+    { title:"Mission Impossible: Fallout",      year:2018, genre:"Action/Spy",           rating:7.7, desc:"Ethan Hunt races against time to prevent a global catastrophe.",     streaming:["Netflix","Prime Video"],   emoji:"💣" },
+    { title:"War",                              year:2019, genre:"Indian Action",        rating:6.5, desc:"An agent is assigned to eliminate his former mentor.",               streaming:["Netflix","Prime Video"],   emoji:"💥" },
+  ],
+};
+
+function selectMood(mood, el) {
+  // Multi-select toggle
+  if (selectedMoods.has(mood)) {
+    if (selectedMoods.size === 1) return; // keep at least one selected
+    selectedMoods.delete(mood);
+    el.classList.remove("active");
+  } else {
+    selectedMoods.add(mood);
+    el.classList.add("active");
+  }
+}
+
+function loadMovies() {
+  const seen=[],movies=[];
+  const seenSet=new Set();
+  for(const mood of selectedMoods)
+    for(const m of(MOVIE_DB[mood]||[]))
+      if(!seenSet.has(m.title)){seenSet.add(m.title);movies.push({...m});}
+  movies.sort((a,b)=>b.rating-a.rating);
+  const moodLabel=[...selectedMoods].map(m=>({happy:'😊 Happy',romantic:'💕 Romantic',comedy:'😂 Comedy',family:'👨‍👩‍👧 Family',thriller:'😰 Thriller',suspense:'🔍 Suspense',sad:'😢 Emotional',action:'💥 Action'}[m]||m)).join(' + ');
+  document.getElementById('movie-results').innerHTML=`
+    <div style="font-family:'Syne',sans-serif;font-size:15px;font-weight:700;margin-bottom:5px">${moodLabel} — ${movies.length} Movies</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:16px">Sorted by rating · Click a platform button to watch directly 🎬</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px">
+      ${movies.map(m=>`
+        <div class="movie-card" style="border-radius:14px;overflow:hidden">
+          <div style="position:relative">
+            ${getPoster(m.title,m.emoji)}
+            <div style="position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.78);
+              backdrop-filter:blur(6px);border-radius:8px;padding:3px 8px;
+              font-size:11px;font-weight:700;color:#FBBF24">⭐ ${m.rating}</div>
+          </div>
+          <div style="padding:12px">
+            <div style="font-weight:700;font-size:13px;margin-bottom:1px;line-height:1.3">${m.title}</div>
+            <div style="font-size:11px;color:var(--accent3);font-weight:600;margin-bottom:3px">${m.year}</div>
+            <div style="font-size:10px;color:var(--text3);margin-bottom:7px">${m.genre}</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.5;margin-bottom:10px">${m.desc}</div>
+            <div style="font-size:9px;font-weight:700;letter-spacing:0.8px;color:var(--text3);margin-bottom:5px">WATCH ON</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px">
+              ${(m.streaming||[]).filter(s=>STREAMING_COLORS[s]).map(s=>`
+                <a href="${getWatchLink(s,m.title)}" target="_blank" rel="noopener"
+                  style="padding:4px 10px;border-radius:7px;font-size:10px;font-weight:700;
+                  background:${STREAMING_COLORS[s]};color:white;text-decoration:none;
+                  display:inline-block">${s}</a>`).join('')}
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+
+
+// ══════════════════════════════════════════════════════════════════════════════
+// MOTIVATION — keyword detection in sendMsg (used below in CHAT section)
+// ══════════════════════════════════════════════════════════════════════════════
+const MOTIVATION_TRIGGERS = [
+  "give me motivation","give some motivation","motivate me","need motivation",
+  "inspire me","feeling demotivated","unmotivated","give motivation","boost me",
+  "give me a quote","i need a quote","need a quote","inspire me please",
+  "feeling low","feeling down","i can't do this","i cant do this",
+  "want to give up","feel like giving up","lost motivation","no motivation",
+];
+
+// Situation patterns that auto-trigger a motivational boost inline in any response
+const SITUATION_PATTERNS = [
+  { re: /exam|test|quiz|paper|board|semester|finals|midterm/i,    ctx: "exam"      },
+  { re: /nervous|anxious|scared|afraid|worried|fear.*present/i,   ctx: "nervous"   },
+  { re: /study|homework|assignment|project|deadline|submit/i,      ctx: "study"     },
+  { re: /interview|job|career|work|office|boss|resign/i,           ctx: "work"      },
+  { re: /depress|sad|lonely|alone|hopeless|giving up|lost/i,       ctx: "depression"},
+  { re: /trip|travel|outing|plan|explore|vacation|holiday/i,       ctx: "travel"    },
+  { re: /new|start|begin|launch|habit|change|try something/i,      ctx: "new_task"  },
+  { re: /heartbreak|breakup|broke up|relationship|miss (him|her)/i,ctx: "heartbreak"},
+  { re: /fail|failed|failure|didn't pass|didn't clear/i,           ctx: "failure"   },
+  { re: /tired|exhausted|burnt out|no energy|drained/i,            ctx: "tired"     },
+];
+
+const CONTEXTUAL_MOTIVATIONS = {
+  exam: [
+    "📚 Hey, you've got this! Your brain has absorbed more than you think — trust what you've prepared. Walk in with your head high, breathe, and give it your best. That's all anyone can ask! 💪",
+    "🎓 Listen — every single person sitting that exam is nervous. The difference is YOU showed up. That already makes you ahead. Take a deep breath, recall what you know, and go get it! ⭐",
+    "✨ Your mom would say: 'Just go and write what you know, beta — you've worked hard!' And she'd be right. Believe in yourself the way the people who love you believe in you. You've got this! 🌟",
+    "💡 Exams test memory, not your worth. You are so much more than a score. But you've studied, you're prepared — now go show that paper what you're made of! 🔥",
+  ],
+  nervous: [
+    "🤗 It's okay to be nervous — that just means it matters to you! Take 3 slow deep breaths right now. In through your nose... hold... out slowly. Feel that? That's your body calming itself. You can do this. 💙",
+    "🌸 Being nervous is your body getting ready for something important. Channel that energy — use it! The butterflies in your stomach? Tell them to fly in formation. You've prepared for this moment. 💪",
+    "😊 You know what? Your worry shows how much you care. And people who care — really care — always find a way to pull through. I believe in you completely. Take it one step at a time. ✨",
+  ],
+  study: [
+    "📖 One page at a time, one concept at a time. You don't have to know everything right now — just start. Starting is the hardest part and you've already done it! 🌱",
+    "🎯 Your brain is literally building new connections right now as you study. Every minute you put in is permanent progress. Rest when you need to, but don't quit. Future you will be so grateful! ⭐",
+    "💡 Even 20 focused minutes of studying beats 3 hours of distracted studying. You're doing better than you think. Keep going — just a little more! 🔥",
+  ],
+  work: [
+    "💼 Show up today like the person you're becoming — not the person who's tired. Every task you finish, every call you take, every problem you solve is compounding into something bigger than you see right now. 🚀",
+    "⚡ Hard days at work don't mean you're failing — they mean you're growing. The most successful people have bad days too. The difference is they keep going. So keep going! 💪",
+    "🌟 You are more capable than your current circumstances suggest. This challenge? It's temporary. Your growth from handling it? Permanent. You've got this! ✨",
+  ],
+  depression: [
+    "💙 Hey. It's okay to not be okay. You don't have to be strong every minute. Rest if you need to. But please don't give up — the world is genuinely better with you in it, exactly as you are. 🤗",
+    "🌈 Healing isn't a straight line. Some days you'll feel great, some days you won't. Both are part of the journey. Be as gentle with yourself today as you would be with someone you love. 💜",
+    "🕯️ Even the smallest light matters in darkness. You matter. Your feelings are valid. And you are not alone in this — even when it feels that way. One breath at a time, okay? 💙",
+  ],
+  travel: [
+    "🌍 Yes! Travel is one of the best things you can do for your mind and soul. New places = new perspectives = new energy. Your post-exam trip is going to be AMAZING — something to genuinely look forward to! ✈️",
+    "🏖️ Planning a trip is already doing something good for your mental health! Even just the anticipation of adventure lifts your mood. Go explore — you deserve every beautiful moment of it! 🌅",
+    "🎒 Life is short and the world is big. Your wanderlust is your heart telling you it needs new experiences. Listen to it! This trip is going to recharge you in ways you can't even imagine yet. 🌟",
+  ],
+  new_task: [
+    "🎯 Starting something new is always the scariest moment — and you're already past it because you've decided to begin! Every expert, every master, every pro was once exactly where you are right now. 🔥",
+    "✨ The discomfort you feel is not a warning — it's the feeling of growth. Lean into it. Every great thing in your life started with a moment where you didn't know if you could do it. You could. You will. 💪",
+    "🌱 New beginnings are gifts. You get to become someone new, learn something new, experience something new. That's exciting, not scary. Go for it with everything you have! 🚀",
+  ],
+  heartbreak: [
+    "💔 I know this hurts in a way that feels physical. It's real pain, and you're allowed to feel it. But you are not broken — you are healing. And one day this will have made you stronger, kinder, and wiser. 💙",
+    "🌸 Heartbreak is proof that you loved deeply. That's never a weakness. Take time to grieve, to heal, to rest. You will love again — and next time, you'll know yourself even better. 🤗",
+    "🌅 Right now feels like the end of everything, but it's actually the beginning of a chapter that's just for you. Rediscover yourself. Fall in love with your own life first. Everything else will follow. ✨",
+  ],
+  failure: [
+    "🌟 Failing at something doesn't make you a failure — it makes you someone who tried. And trying is EVERYTHING. Every person you admire has failed more times than you know. This is just your turn to learn. 💪",
+    "🔥 Thomas Edison failed 10,000 times before the lightbulb. J.K. Rowling was rejected 12 times. Your failure is not the end — it's just chapter one of your comeback story. 🚀",
+    "💙 Be gentle with yourself today. You gave it your best. Now rest, reflect, and then rise. You are not done — not even close. The best version of this story is still ahead of you. ✨",
+  ],
+  tired: [
+    "😴 Rest is not giving up — it is part of the process. Your body and mind need recovery just like your muscles do. Take the rest you need, and come back stronger. You've earned it. 💙",
+    "🌿 Being exhausted means you've been working hard. That matters. But burning out serves no one. Rest, recharge, and then get back to it. You're doing more than you realise. 🤗",
+    "☕ It's okay to slow down. Even rivers slow at bends. You're allowed to take a breath, have a moment, and then continue. You don't have to be at full speed every single day. 🌸",
+  ],
+  general: [
+    "💪 The only person you need to be better than is who you were yesterday. And just by being here, talking, trying — you already are. 🌟",
+    "🌟 You have exactly what it takes. You always have. Now it's time to use it. I believe in you! ✨",
+    "🎯 One day at a time. Sometimes one hour. Sometimes one breath. That is always enough. 💙",
+    "✨ You are not the sum of your worst days. You are also every small act of courage, every time you kept going. That person is extraordinary. 🔥",
+    "🔥 Progress is not always visible. Sometimes healing, growing, and becoming happen quietly inside you. Trust the process. 🌱",
+    "🤗 Even on the hardest days, something in you keeps going. That something is strength. Never forget that. 💪",
+  ],
+};
+
+function getContextualMotivation(text) {
+  const t = text.toLowerCase();
+  for (const { re, ctx } of SITUATION_PATTERNS) {
+    if (re.test(t) && CONTEXTUAL_MOTIVATIONS[ctx]) return CONTEXTUAL_MOTIVATIONS[ctx];
+  }
+  return CONTEXTUAL_MOTIVATIONS.general;
+}
+
+function isMotivationRequest(text) {
+  const t = text.toLowerCase().trim();
+  return MOTIVATION_TRIGGERS.some(trigger => t.includes(trigger));
+}
+
+// Detect if a message (even non-trigger) has a situational context needing motivation boost
+function getSituationBoost(text) {
+  const t = text.toLowerCase();
+  for (const { re, ctx } of SITUATION_PATTERNS) {
+    if (re.test(t) && CONTEXTUAL_MOTIVATIONS[ctx]) {
+      const pool = CONTEXTUAL_MOTIVATIONS[ctx];
+      return pool[Math.floor(Math.random() * pool.length)];
+    }
+  }
+  return null;
+}
+
+function buildMotivationResponse(text) {
+  const pool  = getContextualMotivation(text);
+  const quote = pool[Math.floor(Math.random() * pool.length)];
+  return `${quote}\n\n_Remember: Every great journey began with someone who felt exactly how you feel right now — and chose to take the next step anyway._ 💙`;
+}
+
+// ── Contact-aware response injection ─────────────────────────────────────────
+function maybeInjectContactSuggestion(emotion, trend, response) {
+  const negativeStates = ["sadness","grief","fear","disappointment","remorse","anger","nervousness"];
+  if (!negativeStates.includes(emotion)) return response;
+  if (trend !== "persistent_negative" && trend !== "worsening") return response;
+  const contact = getRandomContact();
+  if (!contact) return response;
+  const suggestions = [
+    `\n\n💙 I know you're carrying a lot right now. Sometimes talking to someone we trust makes a real difference — if you feel like it, you could reach out to **${contact.name}** (${contact.rel}). Even a short message can help you feel less alone.`,
+    `\n\n🤗 When things feel this heavy, connection is one of the most powerful things. Have you considered reaching out to **${contact.name}**? They care about you, and a conversation might bring some relief.`,
+    `\n\n💌 You don't have to go through this alone. **${contact.name}** (${contact.rel}) might be just the person to talk to right now — even just to say hi.`,
+  ];
+  return response + suggestions[Math.floor(Math.random() * suggestions.length)];
+}
+
+// ── Outing / travel suggestion — fires for ALL emotions (positive too) ────────
+function maybeInjectOutingSuggestion(emotion, trend, userText) {
+  const t = (userText || "").toLowerCase();
+
+  // Always fire if user explicitly mentions trip/travel/explore
+  const travelKeywords = /trip|travel|outing|explore|vacation|holiday|places|visit|go out|getaway/i;
+  const isExplicit = travelKeywords.test(t);
+
+  // For negative emotions — fire 40% of time
+  const negStates = ["sadness","grief","fear","disappointment","nervousness","remorse","annoyance"];
+  const isNeg = negStates.includes(emotion) && (trend === "persistent_negative" || trend === "worsening");
+
+  // For positive emotions — fire 25% of time (good vibes deserve celebration suggestions)
+  const posStates = ["joy","excitement","optimism","pride","gratitude","relief","amusement"];
+  const isPos = posStates.includes(emotion);
+
+  if (!isExplicit && !isNeg && !(isPos && Math.random() < 0.25)) return "";
+  if (!isExplicit && isNeg && Math.random() > 0.4) return "";
+
+  const negativeSuggestions = [
+    "\n\n🌿 **Outing idea:** Sometimes a change of scenery is exactly what the mind needs. Even a short walk in a park, a visit to a café, or an evening drive can shift your mood in ways that are hard to explain but very real.",
+    "\n\n✈️ **Trip idea:** Have you thought about planning a small getaway? Even a day trip to a nearby town, a nature trail, or a beach can give your mind the reset it's been asking for. New sights = new thoughts. 🌄",
+    "\n\n☕ **Get out today:** Step outside, even for 30 minutes. A walk, some fresh air, maybe a chai at your favourite spot. Movement is medicine — especially for a heavy heart. 🚶",
+    "\n\n🏔️ **Plan something to look forward to:** Could you plan even a small outing — a movie, a meal out, a drive — with someone you enjoy? Having something ahead on the calendar is genuinely mood-lifting. 🎉",
+  ];
+
+  const positiveSuggestions = [
+    "\n\n🌍 **Since you're feeling great —** this is the perfect energy to plan an adventure! A weekend trip, a new restaurant, a nature trail... go do something that feeds this good feeling! ✈️",
+    "\n\n🏖️ **Celebrate the good mood:** Why not plan a little outing? Even a spontaneous drive, a picnic, or exploring a new part of your city can turn a good day into an unforgettable one. 🌅",
+    "\n\n🎒 **This energy is travel energy!** Seriously — book that trip you've been thinking about, or just step outside and explore somewhere new. Life's too short to save adventures for later. 🌟",
+  ];
+
+  const travelDetailSuggestions = [
+    "\n\n🗺️ **3-Day Trip Ideas:**\n• **Day 1:** Reach your destination, explore local markets, street food tour 🍜\n• **Day 2:** Nature/sightseeing highlights + local experiences 🏞️\n• **Day 3:** Relaxed morning, souvenirs, head back refreshed 🎒\n\nPick a hill station, beach town, or heritage city within 300km for a perfect 3-day refresh! 🌄",
+    "\n\n✈️ **Quick Getaway Plan:**\nFor 3 days, consider: Coorg/Ooty (nature 🌿), Hampi/Mysore (heritage 🏛️), Goa (beach 🏖️), or Pondicherry (calm + culture 🌸). Book early for the best deals! Pack light, plan loose — the best trips have unplanned moments. 🌟",
+  ];
+
+  // If explicit travel question, give detailed plan
+  if (isExplicit) {
+    return travelDetailSuggestions[Math.floor(Math.random() * travelDetailSuggestions.length)];
+  }
+  if (isPos) return positiveSuggestions[Math.floor(Math.random() * positiveSuggestions.length)];
+  return negativeSuggestions[Math.floor(Math.random() * negativeSuggestions.length)];
+}
+
+// ── Emoji enrichment for bot responses ───────────────────────────────────────
+// Adds contextual emoji to plain server responses that don't have any
+function enrichWithEmoji(text, emotion) {
+  if (!text) return text;
+  // Already has emoji — don't add more
+  const emojiRegex = /[\u{1F300}-\u{1FFFF}]/u;
+  if (emojiRegex.test(text)) return text;
+
+  const emotionEmojis = {
+    joy:"😊", sadness:"💙", anger:"😤", fear:"😨", excitement:"🎉",
+    gratitude:"🙏", love:"❤️", pride:"💪", grief:"💔", optimism:"🌈",
+    nervousness:"🤗", disappointment:"💫", neutral:"✨", surprise:"😲",
+    relief:"😌", curiosity:"🤔", caring:"🤗", amusement:"😄",
+  };
+  const prefix = emotionEmojis[emotion] || "💬";
+  return `${prefix} ${text}`;
+}
+
+// ─── CHAT ────────────────────────────────────────────────────────────────────
+const FAREWELLS = ["bye","goodbye","goodnight","good night","take care",
+                   "see you","cya","going to sleep","need to rest","good bye"];
+const MOTIVATIONS_Q = [
+  "give me motivation","give some motivation","motivate me","need motivation",
+  "inspire me","feeling demotivated","unmotivated","give motivation","boost me"
+];
+
+function sendMsg() {
+  const inp  = document.getElementById("userinput");
+  const text = inp.value.trim();
+
+  // ── Multi-image send ────────────────────────────────────────────────────
+  if (pendingImgs.length > 0) {
+    const cap  = text || (pendingImgs.length === 1 ? "I wanted to share this." : `Sharing ${pendingImgs.length} photos with you.`);
+    const imgs = [...pendingImgs];
+    inp.value = ""; inp.style.height = "42px";
+    clearImgPrev();
+    document.getElementById("sbtn").disabled = true;
+
+    // Show thumbnails in user bubble
+    const row = document.createElement("div");
+    row.className = "msg-row u";
+    if (imgs.length === 1) {
+      row.innerHTML = `
+        <div class="mc" style="align-items:flex-end">
+          <div class="mem-bub"><img src="${imgs[0]}"><div class="mem-cap">${esc(cap)}</div></div>
+        </div>
+        <div class="mav">${CU[0].toUpperCase()}</div>`;
+    } else {
+      const thumbsHtml = imgs.map(b64 =>
+        `<img src="${b64}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid rgba(255,255,255,0.1)">`).join("");
+      row.innerHTML = `
+        <div class="mc" style="align-items:flex-end">
+          <div style="display:flex;gap:5px;flex-wrap:wrap;max-width:320px;justify-content:flex-end">${thumbsHtml}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.55);margin-top:4px">📎 ${imgs.length} photos — ${esc(cap)}</div>
+        </div>
+        <div class="mav">${CU[0].toUpperCase()}</div>`;
+    }
+    document.getElementById("messages").appendChild(row);
+    scrollB();
+
+    const typing = addTyping();
+    fetch("/upload_memory",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({image:imgs[0],caption:cap,name:CU})})
+    .then(r=>r.json()).then(d=>{
+      typing.remove();
+      addBot(d.response,null,false,false);
+      document.getElementById("sbtn").disabled = false;
+    }).catch(()=>{
+      typing.remove();
+      addBot(imgs.length===1?"Thanks for sharing!":"📸 Thanks for sharing these memories!",null,false,false);
+      document.getElementById("sbtn").disabled=false;
+    });
+    return;
+  }
+
+  // ── Legacy single pendingImg fallback ───────────────────────────────────
+  if (pendingImg) {
+    const cap = text || "I wanted to share this with you.";
+    inp.value = ""; inp.style.height = "42px";
+    clearImgPrev();
+    document.getElementById("sbtn").disabled = true;
+    const imgToSend = pendingImg; pendingImg = "";
+    const row = document.createElement("div");
+    row.className = "msg-row u";
+    row.innerHTML = `
+      <div class="mc" style="align-items:flex-end">
+        <div class="mem-bub"><img src="${imgToSend}"><div class="mem-cap">${esc(cap)}</div></div>
+      </div>
+      <div class="mav">${CU[0].toUpperCase()}</div>`;
+    document.getElementById("messages").appendChild(row);
+    scrollB();
+    const typing = addTyping();
+    fetch("/upload_memory",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({image:imgToSend,caption:cap,name:CU})})
+    .then(r=>r.json()).then(d=>{
+      typing.remove();
+      addBot(d.response,null,false,false);
+      document.getElementById("sbtn").disabled = false;
+    }).catch(()=>{typing.remove();addBot("Thanks for sharing!",null,false,false);document.getElementById("sbtn").disabled=false;});
+    return;
+  }
+
+  if (!text) return;
+  const low = text.toLowerCase();
+  inp.value = ""; inp.style.height = "42px";
+  document.getElementById("sbtn").disabled = true;
+  addUser(text);
+
+  if (FAREWELLS.some(w => low.includes(w))) {
+    const opts = [
+      `Take good care of yourself, ${CU}! 💙 I'll be here whenever you need. Rest well!`,
+      `Goodnight! 🌙 It was so good talking with you today. Come back anytime.`,
+      `Take care! ✨ You matter a lot. I'm always here if you need me.`,
+      `Bye for now! 🌟 Remember to be kind to yourself today.`,
+      `Rest well! 💫 Today's conversation meant a lot. See you soon!`
+    ];
+    setTimeout(()=>{
+      addBot(opts[Math.floor(Math.random()*opts.length)],null,false,false);
+      document.getElementById("sbtn").disabled = false;
+    },300);
+    return;
+  }
+
+  // ── Motivation request — contextual response ─────────────────────────────
+  if (isMotivationRequest(text)) {
+    const t2 = addTyping();
+    setTimeout(() => {
+      t2.remove();
+      const motivationText = buildMotivationResponse(text);
+      const row = document.createElement("div");
+      row.className = "msg-row";
+      row.innerHTML = `
+        <div class="mav">🧠</div>
+        <div class="mc">
+          <div class="mb bb" style="background:linear-gradient(135deg,rgba(108,142,255,0.08),rgba(167,139,250,0.08));border:1px solid rgba(108,142,255,0.25);border-left:3px solid var(--accent2)">
+            <div style="font-size:9px;letter-spacing:1px;color:var(--text3);margin-bottom:8px">✨ MOTIVATION FOR YOU</div>
+            <div style="font-size:14px;line-height:1.8;white-space:pre-line">${esc(motivationText)}</div>
+          </div>
+        </div>`;
+      document.getElementById("messages").appendChild(row);
+      scrollB();
+      document.getElementById("sbtn").disabled = false;
+      document.getElementById("userinput").focus();
+    }, 800);
+    return;
+  }
+
+  const typing = addTyping();
+  fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message:text,name:CU})})
+  .then(r=>r.json()).then(d=>{
+    typing.remove();
+    if (d.retrain_running) { showFreeze(); return; }
+    if (!CLIENT_MODE && d.memory) ClientStore.merge(CU, d.memory);
+    updateEmotionBar(d.emotion, d.confidence, d.trend);
+    const tag = `[${d.emotion} | ${Math.round(d.confidence*100)}% | ${d.trend}${d.is_crisis?" ⚠️":""}${d.is_medical?" 🏥":""}]`;
+
+    // ── Emoji enrichment ──────────────────────────────────────────────────
+    let finalResponse = enrichWithEmoji(d.response, d.emotion);
+
+    // ── Situation-aware motivation boost (for non-trigger situational msgs) ─
+    const boost = getSituationBoost(text);
+    if (boost && Math.random() < 0.7) {
+      finalResponse += `\n\n${boost}`;
+    }
+
+    // ── Contact suggestion for persistent negative emotions ───────────────
+    finalResponse = maybeInjectContactSuggestion(d.emotion, d.trend, finalResponse);
+
+    // ── Travel/outing suggestion ──────────────────────────────────────────
+    finalResponse += maybeInjectOutingSuggestion(d.emotion, d.trend, text);
+
+    addBot(finalResponse, tag, d.is_crisis, d.is_medical);
+    document.getElementById("sbtn").disabled = false;
+    document.getElementById("userinput").focus();
+  }).catch(()=>{
+    typing.remove();
+    addBot("Something went wrong. Please try again.",null,false,false);
+    document.getElementById("sbtn").disabled=false;
+  });
+}
+
+function addUser(text) {
+  const row = document.createElement("div");
+  row.className = "msg-row u";
+  row.innerHTML = `
+    <div class="mc"><div class="mb ub">${esc(text)}</div></div>
+    <div class="mav">${CU[0].toUpperCase()}</div>`;
+  document.getElementById("messages").appendChild(row);
+  scrollB();
+}
+
+function addBot(text, tag, isCrisis, isMed) {
+  // Add relevant emoji to response text
+  const withEmoji = addResponseEmoji(text, isCrisis, isMed);
+  const row = document.createElement("div");
+  row.className = "msg-row";
+  const cls = isCrisis ? "cb" : isMed ? "mdb" : "bb";
+  row.innerHTML = `
+    <div class="mav">🧠</div>
+    <div class="mc">
+      ${tag?`<div class="mtag">${esc(tag)}</div>`:""}
+      <div class="mb ${cls}">${esc(withEmoji)}</div>
+    </div>`;
+  document.getElementById("messages").appendChild(row);
+  scrollB();
+}
+
+function addResponseEmoji(text, isCrisis, isMed) {
+  if (isCrisis) return "💙 " + text;
+  if (isMed)    return "🏥 " + text;
+  // Add contextual emoji at start based on keywords
+  const low = text.toLowerCase();
+  if (low.includes("wonderful") || low.includes("great") || low.includes("amazing")) return "✨ " + text;
+  if (low.includes("sorry") || low.includes("hard") || low.includes("difficult")) return "💙 " + text;
+  if (low.includes("brave") || low.includes("strength") || low.includes("courage")) return "💪 " + text;
+  if (low.includes("rest") || low.includes("sleep") || low.includes("night")) return "🌙 " + text;
+  if (low.includes("happy") || low.includes("joy") || low.includes("glad")) return "😊 " + text;
+  return text;
+}
+
+function addSys(text) {
+  const d = document.createElement("div");
+  d.className   = "sys-bub";
+  d.textContent = text;
+  document.getElementById("messages").appendChild(d);
+  scrollB();
+}
+
+function addTyping() {
+  const row = document.createElement("div");
+  row.className = "msg-row";
+  row.innerHTML = `
+    <div class="mav">🧠</div>
+    <div class="mc"><div class="mb bb"><div class="dots"><span></span><span></span><span></span></div></div></div>`;
+  document.getElementById("messages").appendChild(row);
+  scrollB();
+  return row;
+}
+
+function scrollB() { const m=document.getElementById("messages"); m.scrollTop=m.scrollHeight; }
+function esc(s) { return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+
+// ─── IMAGE UPLOAD ──────────────────────────────────────────────────────────
+// ── Multi-image preview tray CSS (injected once) ──────────────────────────
+const MAX_IMGS = 10;
+
+function renderImgTray() {
+  const bar    = document.getElementById('img-preview-bar');
+  const thumbs = document.getElementById('img-tray-thumbs');
+  const count  = document.getElementById('img-tray-count');
+  if (!bar || !thumbs) return;
+  if (!pendingImgs.length) { bar.style.display='none'; thumbs.innerHTML=''; return; }
+  bar.style.display = 'flex';
+  if (count) count.textContent = pendingImgs.length + ' / ' + MAX_IMGS;
+  thumbs.innerHTML = pendingImgs.map(function(b64,i){ return (
+    '<div style="position:relative;width:58px;height:58px;border-radius:8px;overflow:hidden;flex-shrink:0;border:1.5px solid var(--border2)">' +
+    '<img src="' + b64 + '" style="width:100%;height:100%;object-fit:cover;display:block">' +
+    '<button onclick="removeTrayImg(' + i + ')" style="position:absolute;top:2px;right:2px;width:16px;height:16px;border-radius:50%;background:rgba(0,0,0,0.75);color:white;font-size:9px;cursor:pointer;border:none;padding:0">✕</button>' +
+    '</div>');}).join('') +
+    (pendingImgs.length < MAX_IMGS ?
+      '<div onclick="document.getElementById('/imgf/').click()" title="Add more" style="width:58px;height:58px;border-radius:8px;flex-shrink:0;background:var(--surface2);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text3);font-size:22px">＋</div>' : '');
+  var inp = document.getElementById('userinput');
+  inp.placeholder = pendingImgs.length === 1 ? 'Add a caption and press Enter...' : 'Add a caption for ' + pendingImgs.length + ' photos...';
+  inp.focus();
+}
+
+function removeTrayImg(idx) {
+  pendingImgs.splice(idx, 1);
+  if (!pendingImgs.length) clearImgPrev(); else renderImgTray();
+}
+
+function handleImgs(e) {
+  var files = Array.from(e.target.files);
+  e.target.value = '';
+  if (!files.length) return;
+  var slots = MAX_IMGS - pendingImgs.length;
+  if (slots <= 0) { alert('Max ' + MAX_IMGS + ' photos at once.'); return; }
+  var toLoad = files.slice(0, slots);
+  var done = 0;
+  toLoad.forEach(function(file) {
+    var r = new FileReader();
+    r.onload = function(ev) {
+      pendingImgs.push(ev.target.result);
+      done++;
+      if (done === toLoad.length) renderImgTray();
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+function clearImgPrev() {
+  pendingImg = ''; pendingImgs = [];
+  var bar = document.getElementById('img-preview-bar');
+  var thumbs = document.getElementById('img-tray-thumbs');
+  if (bar) bar.style.display = 'none';
+  if (thumbs) thumbs.innerHTML = '';
+  var inp = document.getElementById('userinput');
+  if (inp) inp.placeholder = 'How are you feeling today? (Enter to send)';
+}
+
+function sendMultiImgs(images) {
+  document.getElementById("sbtn").disabled = true;
+  const row = document.createElement("div");
+  row.className = "msg-row u";
+  const thumbs = images.map(b64=>`<img src="${b64}" style="width:75px;height:75px;object-fit:cover;border-radius:8px">`).join("");
+  row.innerHTML = `
+    <div class="mc" style="align-items:flex-end">
+      <div style="display:flex;gap:5px;flex-wrap:wrap;max-width:300px;justify-content:flex-end">${thumbs}</div>
+      <div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px">${images.length} photos</div>
+    </div>
+    <div class="mav">${CU[0].toUpperCase()}</div>`;
+  document.getElementById("messages").appendChild(row);
+  scrollB();
+  const typing = addTyping();
+  fetch("/upload_memory",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({image:images[0],caption:`Sharing ${images.length} photos with you.`,name:CU})})
+  .then(r=>r.json()).then(d=>{typing.remove();addBot(d.response,null,false,false);document.getElementById("sbtn").disabled=false;})
+  .catch(()=>{typing.remove();addBot("📸 Thanks for sharing these memories!",null,false,false);document.getElementById("sbtn").disabled=false;});
+}
+
+// ─── VOICE ────────────────────────────────────────────────────────────────
+function toggleVoice() {
+  if (isRecording) { stopVoice(); return; }
+  if (location.protocol==="http:" && location.hostname!=="127.0.0.1" && location.hostname!=="localhost") {
+    alert("Microphone needs HTTPS.\nOpen: https://" + location.hostname + ":5000");
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({audio:true})
+  .then(stream => {
+    audioChunks = [];
+    const mime = MediaRecorder.isTypeSupported("audio/webm;codecs=opus") ? "audio/webm;codecs=opus" : "audio/webm";
+    mediaRec = new MediaRecorder(stream, {mimeType:mime});
+    mediaRec.ondataavailable = e => { if(e.data.size>0) audioChunks.push(e.data); };
+    mediaRec.onstop = async () => {
+      stream.getTracks().forEach(t=>t.stop());
+      const blob = new Blob(audioChunks,{type:mime});
+      audioChunks = [];
+      const vs = document.getElementById("vstatus");
+      vs.style.display="block"; vs.textContent="⏳ Processing speech...";
+      const fd = new FormData();
+      fd.append("audio",blob,"voice.webm"); fd.append("name",CU);
+      try {
+        const resp = await fetch("/transcribe",{method:"POST",body:fd});
+        const data = await resp.json();
+        vs.style.display="none";
+        if (data.text&&data.text.trim()) { document.getElementById("userinput").value=data.text.trim(); sendMsg(); }
+        else alert(data.error||"No speech detected.");
+      } catch(err) { vs.style.display="none"; alert("Transcription error: "+err.message); }
+    };
+    mediaRec.start();
+    isRecording = true;
+    document.getElementById("mbtn").classList.add("rec");
+    document.getElementById("mbtn").textContent = "⏹";
+    const vs = document.getElementById("vstatus");
+    vs.style.display="block"; vs.textContent="🎙️ Recording... tap ⏹ to stop";
+  })
+  .catch(err => {
+    if (err.name==="NotAllowedError") alert("Microphone blocked.\nIn Brave: click 🔒 in address bar → Allow Microphone");
+    else alert("Mic error: "+err.message);
+  });
+}
+
+function stopVoice() {
+  isRecording = false;
+  document.getElementById("mbtn").classList.remove("rec");
+  document.getElementById("mbtn").textContent = "🎙️";
+  if (mediaRec && mediaRec.state !== "inactive") mediaRec.stop();
+}
+
+// ─── AVATAR UPLOAD ────────────────────────────────────────────────────────
+function uploadAv(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    const b64 = ev.target.result;
+    // Save to localStorage immediately so it persists across logouts
+    if (CU) ClientStore.saveAvatar(CU, b64);
+    else avB64 = b64;  // user not logged in yet (login screen avatar)
+    fetch("/upload_avatar",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({image:b64,name:CU})})
+    .then(()=>setAv(b64));
+  };
+  r.readAsDataURL(file);
+}
+
+// ─── EMOTION INSIGHTS ────────────────────────────────────────────────────
+function loadInsights() {
+  fetch(`/analyze_graph?name=${encodeURIComponent(CU)}`)
+  .then(r=>r.json()).then(data=>{
+    const ec    = data.emotion_counts||{};
+    const total = data.total||0;
+    const dom   = data.dominant||"neutral";
+    const pct   = total > 0 ? Math.round(((ec[dom]||0)/total)*100) : 0;
+
+    // Emotional consistency (% of dominant emotion)
+    document.getElementById("ei-con-fill").style.width = pct + "%";
+    document.getElementById("ei-con-pct").textContent  = pct + "%";
+
+    // Insight text
+    if (total > 0) {
+      const insight = `Your dominant emotion is ${dom} (${pct}% of ${total} interactions). ${
+        pct > 60 ? "You tend to express this emotion consistently." :
+        pct > 30 ? "You show a variety of emotional states." :
+        "Your emotional patterns are diverse and dynamic."
+      }`;
+      document.getElementById("ei-insight").textContent = insight;
+    }
+
+    // Emotion distribution bars
+    const eb = document.getElementById("ei-edist");
+    const sorted = Object.entries(ec).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    const max = Math.max(...sorted.map(e=>e[1]),1);
+    if (sorted.length) {
+      eb.innerHTML = sorted.map(([em,cnt]) =>
+        `<div class="edist-row">
+          <div class="edist-label">${EMOTION_EMOJIS[em]||"😶"} ${em}</div>
+          <div class="edist-bar"><div class="edist-fill" style="width:${Math.round(cnt/max*100)}%;background:${EC[em]||"#4A5568"}"></div></div>
+          <div class="edist-cnt">${cnt}</div>
+        </div>`).join("");
+    }
+  }).catch(()=>{});
+}
+
+// ─── ANALYTICS ────────────────────────────────────────────────────────────
+function loadAnalytics() {
+  fetch(`/stats?name=${encodeURIComponent(CU)}`)
+  .then(r=>r.json()).then(s=>{
+    if (s.error) return;
+    // KPI cards
+    const kg = document.getElementById("an-kpi");
+    kg.innerHTML = [
+      ["🔄",s.sessions||0,"Total Sessions"],
+      ["💬",s.total_messages||0,"Messages Sent"],
+      ["🧬",s.calibrator_obs||0,"Calibrations"],
+    ].map(([icon,num,lbl])=>`
+      <div class="kpi-card">
+        <div class="kpi-icon">${icon}</div>
+        <div class="kpi-num">${num}</div>
+        <div class="kpi-lbl">${lbl}</div>
+      </div>`).join("");
+  }).catch(()=>{});
+
+  fetch(`/analyze_graph?name=${encodeURIComponent(CU)}`)
+  .then(r=>r.json()).then(data=>{
+    const dom = data.dominant||"neutral";
+    const ec  = data.emotion_counts||{};
+    const tot = data.total||0;
+
+    // Dominant
+    document.getElementById("an-dom-icon").textContent = EMOTION_EMOJIS[dom]||"😶";
+    if (tot > 0) {
+      document.getElementById("an-dom-text").textContent = dom;
+      document.getElementById("an-dom-sub").textContent  =
+        `${Math.round(((ec[dom]||0)/tot)*100)}% of ${tot} total interactions`;
+    }
+
+    // Weekly chart
+    drawWeekly(data.timeline||[]);
+
+    // Breakdown
+    const sorted = Object.entries(ec).sort((a,b)=>b[1]-a[1]).slice(0,6);
+    const max    = Math.max(...sorted.map(e=>e[1]),1);
+    document.getElementById("an-breakdown").innerHTML = sorted.length
+      ? sorted.map(([em,cnt])=>`
+          <div class="edist-row">
+            <div class="edist-label">${EMOTION_EMOJIS[em]||"😶"} ${em}</div>
+            <div class="edist-bar"><div class="edist-fill" style="width:${Math.round(cnt/max*100)}%;background:${EC[em]||"#4A5568"}"></div></div>
+            <div class="edist-cnt">${cnt}</div>
+          </div>`).join("")
+      : `<div style="color:var(--text3);text-align:center;padding:20px;font-size:13px">Start chatting to see your emotion breakdown.</div>`;
+  }).catch(()=>{});
+}
+
+function drawWeekly(tl) {
+  const c   = document.getElementById("weekly-canvas");
+  const ctx = c.getContext("2d");
+  const W   = c.offsetWidth || 600;
+  const H   = 160;
+  c.width = W; c.height = H;
+  ctx.clearRect(0, 0, W, H);
+
+  if (!tl.length) {
+    ctx.fillStyle = "rgba(255,255,255,0.3)";
+    ctx.font = "13px DM Sans";
+    ctx.fillText("No weekly data yet — start chatting!", 10, H/2);
+    return;
+  }
+
+  // Layout margins — leave room for X labels (bottom) and Y labels (left)
+  const PAD_L = 40, PAD_R = 12, PAD_T = 18, PAD_B = 28;
+  const CW = W - PAD_L - PAD_R;
+  const CH = H - PAD_T - PAD_B;
+
+  const sc  = tl.map(t => t.score);
+  const mn  = Math.min(...sc, -0.5);
+  const mx  = Math.max(...sc,  0.5);
+  const rng = (mx - mn) || 1;
+
+  const toX = i  => PAD_L + (i / (sc.length - 1 || 1)) * CW;
+  const toY = v  => PAD_T + CH - ((v - mn) / rng) * CH;
+
+  // ── Y-axis grid lines + labels ──────────────────────────────────────────
+  const yTicks = [-1, 0, 1];
+  yTicks.forEach(tick => {
+    const y = toY(tick);
+    if (y < PAD_T - 2 || y > PAD_T + CH + 2) return;
+    // grid line
+    ctx.strokeStyle = tick === 0 ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.05)";
+    ctx.lineWidth = 1;
+    ctx.setLineDash(tick === 0 ? [] : [4,4]);
+    ctx.beginPath(); ctx.moveTo(PAD_L, y); ctx.lineTo(W - PAD_R, y); ctx.stroke();
+    ctx.setLineDash([]);
+    // label
+    ctx.fillStyle = "rgba(255,255,255,0.35)";
+    ctx.font = "10px DM Sans";
+    ctx.textAlign = "right";
+    ctx.textBaseline = "middle";
+    ctx.fillText(tick > 0 ? "+" + tick : tick, PAD_L - 5, y);
+  });
+
+  // ── Gradient fill ────────────────────────────────────────────────────────
+  const grd = ctx.createLinearGradient(0, PAD_T, 0, PAD_T + CH);
+  grd.addColorStop(0, "rgba(108,142,255,0.25)");
+  grd.addColorStop(1, "rgba(108,142,255,0)");
+  ctx.fillStyle = grd;
+  ctx.beginPath();
+  ctx.moveTo(toX(0), toY(sc[0]));
+  sc.forEach((s, i) => i > 0 && ctx.lineTo(toX(i), toY(s)));
+  ctx.lineTo(toX(sc.length - 1), PAD_T + CH);
+  ctx.lineTo(toX(0), PAD_T + CH);
+  ctx.closePath(); ctx.fill();
+
+  // ── Line ─────────────────────────────────────────────────────────────────
+  ctx.strokeStyle = "#6C8EFF"; ctx.lineWidth = 2.5; ctx.lineJoin = "round";
+  ctx.beginPath(); ctx.moveTo(toX(0), toY(sc[0]));
+  sc.forEach((s, i) => i > 0 && ctx.lineTo(toX(i), toY(s)));
+  ctx.stroke();
+
+  // ── Dots + X-axis date labels ─────────────────────────────────────────────
+  sc.forEach((s, i) => {
+    const x = toX(i), y = toY(s);
+    ctx.fillStyle = "#6C8EFF";
+    ctx.beginPath(); ctx.arc(x, y, 4, 0, Math.PI * 2); ctx.fill();
+
+    // Date label under each dot
+    const entry = tl[i];
+    let dateLabel = "";
+    if (entry && entry.date) {
+      // "YYYY-MM-DD" → "DD/MM" or day name
+      const parts = entry.date.split("-");
+      if (parts.length === 3) dateLabel = parts[2] + "/" + parts[1];
+    }
+    if (dateLabel) {
+      ctx.fillStyle = "rgba(255,255,255,0.45)";
+      ctx.font = "9px DM Sans";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.fillText(dateLabel, x, PAD_T + CH + 6);
+    }
+  });
+
+  // ── Y-axis label ──────────────────────────────────────────────────────────
+  ctx.save();
+  ctx.translate(10, PAD_T + CH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillStyle = "rgba(255,255,255,0.25)";
+  ctx.font = "9px DM Sans";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("Mood score", 0, 0);
+  ctx.restore();
+}
+
+// ─── HISTORY ──────────────────────────────────────────────────────────────
+function loadHistory(ov) {
+  const del = document.getElementById("hist-date");
+  const d   = ov==="today" ? new Date().toISOString().split("T")[0] : del.value||new Date().toISOString().split("T")[0];
+  del.value = d;
+  const list = document.getElementById("hist-list");
+  list.innerHTML = `<div style="color:var(--text3);padding:20px;text-align:center;font-size:13px">Loading sessions...</div>`;
+
+  fetch(`/history?date=${d}&name=${encodeURIComponent(CU)}`)
+  .then(r=>r.json()).then(data=>{
+    // ── No data ────────────────────────────────────────────────────────────
+    if (!data.sessions || !data.sessions.length) {
+      const avail = (data.available_dates||[]).slice(-7).join(", ")||"none yet";
+      list.innerHTML=`
+        <div style="text-align:center;padding:40px 20px;color:var(--text3)">
+          <div style="font-size:32px;margin-bottom:12px">📭</div>
+          <div style="font-size:14px;margin-bottom:8px">No sessions found for ${d}</div>
+          <div style="font-size:11px">Recent dates with data: ${avail}</div>
+        </div>`; return;
+    }
+
+    // ── Day summary header ─────────────────────────────────────────────────
+    const totalMsgs = data.sessions.reduce((a,s)=>a+s.msg_count,0);
+    const allEmotions = data.sessions.flatMap(s=>s.emotions);
+    const emotionCounts = {};
+    allEmotions.forEach(e=>emotionCounts[e]=(emotionCounts[e]||0)+1);
+    const dominant = Object.entries(emotionCounts).sort((a,b)=>b[1]-a[1])[0]||["neutral",0];
+
+    list.innerHTML = `
+      <div style="background:linear-gradient(135deg,rgba(108,142,255,0.08),rgba(167,139,250,0.06));
+        border:1px solid rgba(108,142,255,0.2);border-radius:14px;padding:18px;margin-bottom:18px">
+        <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;margin-bottom:12px">
+          📅 ${d} — Day Summary
+        </div>
+        <div style="display:flex;gap:20px;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-size:22px;font-weight:700;color:var(--accent)">${data.sessions.length}</div>
+            <div style="font-size:11px;color:var(--text3)">Sessions</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:22px;font-weight:700;color:var(--accent3)">${totalMsgs}</div>
+            <div style="font-size:11px;color:var(--text3)">Messages</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:22px">${EMOTION_EMOJIS[dominant[0]]||"😶"}</div>
+            <div style="font-size:11px;color:var(--text3)">Dominant: ${dominant[0]}</div>
+          </div>
+        </div>
+        <!-- Emotion frequency bars for the day -->
+        <div style="margin-top:14px">
+          <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);margin-bottom:8px;text-transform:uppercase">Emotion Breakdown</div>
+          ${Object.entries(emotionCounts).sort((a,b)=>b[1]-a[1]).slice(0,6).map(([em,cnt])=>`
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
+              <span style="font-size:13px;width:20px">${EMOTION_EMOJIS[em]||"😶"}</span>
+              <span style="font-size:11px;color:var(--text2);width:90px">${em}</span>
+              <div style="flex:1;height:7px;background:var(--surface3);border-radius:4px;overflow:hidden">
+                <div style="height:100%;width:${Math.round(cnt/totalMsgs*100)}%;background:${EC[em]||"#6C8EFF"};border-radius:4px"></div>
+              </div>
+              <span style="font-size:10px;color:var(--text3);width:24px;text-align:right">${cnt}</span>
+            </div>`).join("")}
+        </div>
+      </div>
+
+      <!-- Session blocks -->
+      <div id="session-blocks"></div>`;
+
+    // ── Render each session as a block ─────────────────────────────────────
+    const sb = document.getElementById("session-blocks");
+    data.sessions.forEach((sess, si) => {
+      const dom = sess.dominant||"neutral";
+      const domColor = EC[dom]||"#6C8EFF";
+      const domEmoji = EMOTION_EMOJIS[dom]||"😶";
+
+      // Emotion shift chain HTML
+      const shiftHTML = sess.shifts.length ?
+        `<div style="display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:8px">
+          <span style="font-size:10px;color:var(--text3);margin-right:2px">Shifts:</span>
+          ${sess.shifts.map(sh=>`
+            <span style="display:flex;align-items:center;gap:3px;background:var(--surface2);
+              border-radius:6px;padding:2px 7px;font-size:10px;border:1px solid var(--border2)">
+              ${EMOTION_EMOJIS[sh.from]||"😶"} <span style="color:var(--text3)">→</span> ${EMOTION_EMOJIS[sh.to]||"😶"}
+              <span style="color:var(--text2);font-size:9px">${sh.from}→${sh.to}</span>
+            </span>`).join("")}
+        </div>` : `<div style="font-size:11px;color:var(--text3);margin-top:8px">No emotion shifts — consistent ${dom} throughout</div>`;
+
+      // Emotion timeline mini chart (sparkline)
+      const sparkW = 200, sparkH = 40;
+      const ems = sess.emotions;
+      const emotionOrder = ["joy","excitement","pride","gratitude","optimism","love","amusement","relief","neutral","curiosity","surprise","confusion","sadness","nervousness","fear","disappointment","anger","grief","remorse"];
+      const pts = ems.map((e,i)=>{
+        const xi = Math.round(i/(ems.length-1||1)*sparkW);
+        const yi = Math.round((emotionOrder.indexOf(e)/emotionOrder.length)*sparkH);
+        return `${xi},${yi}`;
+      });
+
+      // Individual emotion entry list
+      const entryHTML = sess.entries.map((e,ei)=>{
+        const em = e.emotion||"neutral";
+        const ts = (e.timestamp||"").replace("T"," ").substring(11,16);
+        const prev = ei>0 ? sess.entries[ei-1].emotion : null;
+        const shifted = prev && prev!==em;
+        return `
+          <div style="display:flex;align-items:center;gap:10px;padding:7px 10px;
+            border-radius:8px;margin-bottom:4px;
+            background:${shifted?"rgba(251,191,36,0.06)":"var(--surface2)"};
+            border:1px solid ${shifted?"rgba(251,191,36,0.2)":"var(--border2)"}">
+            <span style="font-size:14px">${EMOTION_EMOJIS[em]||"😶"}</span>
+            <div style="flex:1">
+              <span style="font-size:12px;font-weight:600;color:${EC[em]||"var(--text)"}">${em}</span>
+              ${e.topic ? `<span style="font-size:10px;color:var(--text3);margin-left:6px">· ${e.topic}</span>` : ""}
+              ${shifted ? `<span style="font-size:9px;background:rgba(251,191,36,0.15);color:var(--warning);
+                border-radius:4px;padding:1px 5px;margin-left:6px">⚡ shift</span>` : ""}
+            </div>
+            <span style="font-size:10px;color:var(--text3)">${ts}</span>
+          </div>`;
+      }).join("");
+
+      const block = document.createElement("div");
+      block.style.cssText = `background:var(--card-bg);border:1px solid var(--border2);border-left:3px solid ${domColor};
+        border-radius:14px;overflow:hidden;margin-bottom:14px`;
+      block.innerHTML = `
+        <!-- Session header -->
+        <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;
+          background:rgba(0,0,0,0.15);cursor:pointer;user-select:none"
+          onclick="toggleSessionBlock('sb-${si}','sa-${si}')">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:36px;height:36px;border-radius:50%;background:${domColor}20;border:2px solid ${domColor};
+              display:flex;align-items:center;justify-content:center;font-size:18px">${domEmoji}</div>
+            <div>
+              <div style="font-weight:700;font-size:14px">Session ${sess.session_num}</div>
+              <div style="font-size:11px;color:var(--text2)">${sess.start_time} – ${sess.end_time} · ${sess.msg_count} message${sess.msg_count!==1?"s":""}</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="text-align:right">
+              <div style="font-size:11px;color:${domColor};font-weight:600">${dom}</div>
+              ${sess.shifts.length?`<div style="font-size:10px;color:var(--warning)">${sess.shifts.length} shift${sess.shifts.length!==1?"s":""}</div>`:`<div style="font-size:10px;color:var(--text3)">stable</div>`}
+            </div>
+            <span id="sa-${si}" style="color:var(--text3);font-size:14px">▼</span>
+          </div>
+        </div>
+
+        <!-- Session body (collapsible) -->
+        <div id="sb-${si}" style="padding:14px 16px;display:none">
+          <!-- Emotion shift chain -->
+          ${shiftHTML}
+
+          <!-- Sparkline chart -->
+          ${ems.length>1?`
+          <div style="margin:12px 0 6px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);margin-bottom:6px;text-transform:uppercase">Emotion Arc</div>
+            <div style="position:relative;height:${sparkH+20}px;background:var(--surface2);border-radius:8px;overflow:hidden;padding:10px">
+              <svg width="100%" height="${sparkH}" viewBox="0 0 ${sparkW} ${sparkH}" preserveAspectRatio="none" style="display:block">
+                <polyline points="${pts.join(" ")}" fill="none" stroke="${domColor}" stroke-width="2.5" stroke-linejoin="round" opacity="0.8"/>
+                ${ems.map((e,i)=>{
+                  const xi=Math.round(i/(ems.length-1||1)*sparkW);
+                  const yi=Math.round((emotionOrder.indexOf(e)/emotionOrder.length)*sparkH);
+                  return `<circle cx="${xi}" cy="${yi}" r="3.5" fill="${EC[e]||domColor}"/>`;
+                }).join("")}
+              </svg>
+              <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:9px;color:var(--text3)">
+                <span>Positive ▲</span><span>Negative ▼</span>
+              </div>
+            </div>
+          </div>`:""}
+
+          <!-- Topics -->
+          ${sess.topics.length?`
+          <div style="margin:10px 0">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);margin-bottom:6px;text-transform:uppercase">Topics Discussed</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">
+              ${sess.topics.map(t=>`<span style="background:var(--surface2);border:1px solid var(--border2);
+                border-radius:6px;padding:2px 9px;font-size:11px;color:var(--text2)">${t}</span>`).join("")}
+            </div>
+          </div>`:""}
+
+          <!-- Entry-by-entry log -->
+          <div style="margin-top:12px">
+            <div style="font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);margin-bottom:8px;text-transform:uppercase">Message Log</div>
+            ${entryHTML}
+          </div>
+        </div>`;
+      sb.appendChild(block);
+    });
+
+    // Auto-expand the most recent session
+    const lastIdx = data.sessions.length - 1;
+    const lastBlock = document.getElementById(`sb-${lastIdx}`);
+    const lastArrow = document.getElementById(`sa-${lastIdx}`);
+    if (lastBlock) { lastBlock.style.display = "block"; }
+    if (lastArrow) { lastArrow.textContent = "▲"; }
+
+  }).catch(()=>{
+    list.innerHTML=`<div style="color:var(--text3);padding:20px;text-align:center">Could not load history. Make sure you are logged in.</div>`;
+  });
+}
+
+function toggleSessionBlock(blockId, arrowId) {
+  const b = document.getElementById(blockId);
+  const a = document.getElementById(arrowId);
+  if (!b) return;
+  const open = b.style.display !== "none";
+  b.style.display = open ? "none" : "block";
+  if (a) a.textContent = open ? "▼" : "▲";
+}
+
+// ─── PROFILE ──────────────────────────────────────────────────────────────
+function saveProfile() {
+  const bio = document.getElementById("prof-bio").value;
+  // Save profile locally in localStorage (client owns this data)
+  const profile = ClientStore.getProfile(CU);
+  profile.bio = bio;
+  ClientStore.saveProfile(CU, profile);
+  // Also notify server (no-op on server side now, just for compat)
+  fetch("/update_profile",{method:"POST",headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({bio, name:CU})})
+  .then(()=>{
+    const btn=document.querySelector("#panel-profile .lbtn");
+    btn.textContent="Saved ✓ (stored on your device)";
+    setTimeout(()=>btn.textContent="Save Profile",2500);
+  });
+}
+
+// ─── RETRAIN FREEZE ──────────────────────────────────────────────────────
+let freezeStart=null;
+function showFreeze(){
+  freezeStart=Date.now();
+  document.getElementById("freeze-ov").style.display="flex";
+  freezeTimer=setInterval(()=>{
+    document.getElementById("ftimer").textContent=Math.round((Date.now()-freezeStart)/1000)+"s";
+  },1000);
+  pollFreeze();
+}
+function pollFreeze(){
+  fetch("/retrain_status").then(r=>r.json()).then(d=>{
+    if(d.running){setTimeout(pollFreeze,3000);return;}
+    clearInterval(freezeTimer);
+    document.getElementById("freeze-ov").style.display="none";
+    addSys("✅ Model update complete! Chat resumed with improved model.");
+    document.getElementById("sbtn").disabled=false;
+    document.getElementById("userinput").focus();
+  }).catch(()=>setTimeout(pollFreeze,5000));
+}
+function startRetrainPoll(){
+  retrainPoller=setInterval(()=>{
+    fetch("/retrain_status").then(r=>r.json()).then(d=>{
+      if(d.running&&document.getElementById("freeze-ov").style.display!=="flex") showFreeze();
+    });
+  },10000);
+}
+
+// ─── LOGOUT ────────────────────────────────────────────────────────────────
+function logout(){
+  if(!confirm("Sign out of MindBridge?\n\nYour data stays saved on this device for next time.")) return;
+  clearInterval(retrainPoller);
+  fetch("/logout",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:CU})}).then(()=>{
+    // NOTE: We do NOT clear localStorage — user's emotion history, profile,
+    // and avatar stay on their device for the next session (federated privacy).
+    document.getElementById("app").classList.remove("on");
+    document.getElementById("login-screen").style.display="flex";
+    document.getElementById("messages").innerHTML="";
+    document.getElementById("nminput").value="";
+    document.getElementById("lav").innerHTML=`<span style="font-size:24px;color:var(--text3)">👤</span><span style="font-size:10px;color:var(--text3);margin-top:2px">Add Photo</span><div class="ov">📷</div>`;
+    avB64=""; CU=""; pendingImg=""; pendingImgs=[]; clearImgPrev();
+    // Clear login screen avatar so next user starts fresh
+    const lavEl = document.getElementById("lav");
+    if (lavEl) lavEl.innerHTML = `<span style="font-size:24px;color:var(--text3)">👤</span><span style="font-size:10px;color:var(--text3);margin-top:2px">Add Photo</span><div class="ov">📷</div>`;
+  });
+}
+
+// ─── INIT ──────────────────────────────────────────────────────────────────
+fetch("/status").then(r=>r.json()).then(d=>{
+  if(d.retrain_date) document.getElementById("model-status-text").textContent=`Updated ${d.retrain_date}`;
+}).catch(()=>{});
+
+document.getElementById("userinput").addEventListener("input",function(){
+  this.style.height="42px";
+  this.style.height=Math.min(this.scrollHeight,120)+"px";
+});
+</script>
+</body>
+</html>
