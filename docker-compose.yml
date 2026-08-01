@@ -1,0 +1,84 @@
+version: "3.9"
+
+services:
+  mindbridge-server:
+    image: ${SERVER_IMAGE:-ghcr.io/your-org/mindbridge-server:latest}
+    build:
+      context: .
+      dockerfile: Dockerfile.server
+    restart: unless-stopped
+    expose:
+      - "5000"
+    volumes:
+      # Persistent FL data — survives redeploys. This is what retrain.py reads.
+      - mindbridge_user_histories:/app/user_histories
+      - mindbridge_saved_model:/app/saved_model
+    environment:
+      - OLLAMA_URL=http://ollama:11434/api/generate
+    depends_on:
+      - ollama
+    networks:
+      - mindbridge_net
+
+  ollama:
+    image: ollama/ollama:latest
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - mindbridge_net
+    # Pull the model once on first boot:
+    #   docker compose exec ollama ollama pull llama3
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      - MINDBRIDGE_DOMAIN=${MINDBRIDGE_DOMAIN:?set MINDBRIDGE_DOMAIN in .env}
+    volumes:
+      - ./proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+      - caddy_logs:/var/log/caddy
+    depends_on:
+      - mindbridge-server
+    networks:
+      - mindbridge_net
+
+  # ── Scheduled FL retraining — runs retrain.py nightly against the SAME
+  # persistent volumes the server writes to. Using a sidecar container with
+  # its own cron avoids needing cron installed on the host VM at all.
+  retrainer:
+    image: ${SERVER_IMAGE:-ghcr.io/your-org/mindbridge-server:latest}
+    restart: unless-stopped
+    volumes:
+      - mindbridge_user_histories:/app/user_histories
+      - mindbridge_saved_model:/app/saved_model
+    # No cron package needed in the base image — a simple sleep-loop that
+    # checks the hour is more portable across slim bases and needs zero
+    # extra apt installs.
+    entrypoint: >
+      sh -c "while true; do
+               hour=$$(date +%H);
+               if [ \"$$hour\" = \"00\" ]; then
+                 cd /app && python retrain.py;
+                 sleep 3600;
+               fi;
+               sleep 300;
+             done"
+    networks:
+      - mindbridge_net
+
+networks:
+  mindbridge_net:
+
+volumes:
+  mindbridge_user_histories:
+  mindbridge_saved_model:
+  ollama_data:
+  caddy_data:
+  caddy_config:
+  caddy_logs:

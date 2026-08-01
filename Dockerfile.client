@@ -1,0 +1,43 @@
+# ══════════════════════════════════════════════════════════════════════════
+# MindBridge — Local Client (client.py)
+# Built so an end user can run:
+#   docker run -p 5001:5001 -v mindbridge_data:/app/client_data \
+#     ghcr.io/<org>/mindbridge-client --server <central-server-ip>
+# All personal data lives in the mounted volume ON THEIR MACHINE — the whole
+# point of this container is that it never talks to anything except:
+#   1) the central server's /model_download and /receive_gradient endpoints
+#   2) a local Ollama instance (optional, via --network host or OLLAMA_URL)
+# ══════════════════════════════════════════════════════════════════════════
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        curl libgl1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+RUN python -c "from transformers import DistilBertTokenizer, DistilBertModel; \
+    DistilBertTokenizer.from_pretrained('distilbert-base-uncased'); \
+    DistilBertModel.from_pretrained('distilbert-base-uncased')"
+
+COPY client.py .
+COPY chatbot/ ./chatbot/
+COPY templates/ ./templates/
+
+# All personal data goes here — mount this as a named volume so it survives
+# `docker rm` / upgrades. This directory is NEVER pushed anywhere by CI.
+VOLUME ["/app/client_data"]
+
+EXPOSE 5001
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+    CMD curl -f http://localhost:5001/status || exit 1
+
+ENTRYPOINT ["python", "client.py"]

@@ -1,0 +1,49 @@
+# ══════════════════════════════════════════════════════════════════════════
+# MindBridge — Central FL Server (app.py)
+# Multi-stage build: keep final image lean, cache the heavy torch/transformers
+# layer separately from app code so code changes don't invalidate it.
+# ══════════════════════════════════════════════════════════════════════════
+FROM python:3.11-slim AS base
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    TRANSFORMERS_CACHE=/app/.cache/huggingface \
+    HF_HOME=/app/.cache/huggingface
+
+WORKDIR /app
+
+# System deps: build tools for torch wheels, libgl for matplotlib headless
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        build-essential \
+        libgl1 \
+        curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# ── Dependency layer (cached unless requirements.txt changes) ───────────────
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# ── Pre-download DistilBERT weights at build time (avoids cold-start pull) ──
+RUN python -c "from transformers import DistilBertTokenizer, DistilBertModel; \
+    DistilBertTokenizer.from_pretrained('distilbert-base-uncased'); \
+    DistilBertModel.from_pretrained('distilbert-base-uncased')"
+
+# ── App code ──────────────────────────────────────────────────────────────
+COPY app.py .
+COPY chatbot/ ./chatbot/
+COPY templates/ ./templates/
+COPY saved_model/ ./saved_model/
+
+# Persistent-data directories — mount these as volumes in production
+RUN mkdir -p user_histories user_profiles user_uploads saved_model
+
+EXPOSE 5000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:5000/status || exit 1
+
+# gunicorn instead of Flask's dev server for production
+RUN pip install --no-cache-dir gunicorn
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", \
+     "--threads", "4", "--timeout", "120", "app:app"]

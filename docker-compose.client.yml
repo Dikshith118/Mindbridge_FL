@@ -1,0 +1,34 @@
+version: "3.9"
+
+# ══════════════════════════════════════════════════════════════════════════
+# For END USERS running MindBridge on their own laptop.
+# Nothing here talks to your CI/CD — this is what a person downloads and
+# runs to chat with MindBridge, with all their data staying local.
+#
+# Usage:
+#   MINDBRIDGE_SERVER=mindbridge.yourdomain.com docker compose \
+#     -f docker-compose.client.yml up
+#   Then open http://localhost:5001
+# ══════════════════════════════════════════════════════════════════════════
+services:
+  mindbridge-client:
+    image: ghcr.io/your-org/mindbridge-client:latest
+    ports:
+      - "5001:5001"
+    volumes:
+      # ALL personal data (emotion history, profile, avatar) lives here,
+      # on the user's own disk, in a named volume that survives restarts.
+      - mindbridge_client_data:/app/client_data
+    command: ["--server", "${MINDBRIDGE_SERVER:?set MINDBRIDGE_SERVER}"]
+    depends_on:
+      - ollama
+
+  ollama:
+    image: ollama/ollama:latest
+    volumes:
+      - ollama_data:/root/.ollama
+    # First run: docker compose -f docker-compose.client.yml exec ollama ollama pull llama3
+
+volumes:
+  mindbridge_client_data:
+  ollama_data:

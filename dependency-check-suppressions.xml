@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!--
+      Add suppressions here ONLY after confirming a flagged CVE is a false
+      positive or genuinely not exploitable in this project's context.
+      Never suppress to silence a build without investigating first.
+
+      Example:
+      <suppress>
+         <notes>False positive — CVE applies to Node.js package of same name</notes>
+         <packageUrl regex="true">^pkg:pypi/somepkg@.*$</packageUrl>
+         <cve>CVE-2023-00000</cve>
+      </suppress>
+    -->
+</suppressions>

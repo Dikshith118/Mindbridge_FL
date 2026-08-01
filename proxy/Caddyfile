@@ -1,0 +1,25 @@
+# ══════════════════════════════════════════════════════════════════════════
+# Caddy reverse proxy — real, trusted HTTPS (Let's Encrypt), auto-renewed.
+# Replaces app.py's self-signed cert.pem/key.pem generation entirely.
+# Browsers will NOT show the "unsafe" warning that self-signed certs cause,
+# and the microphone/voice-input feature (which requires HTTPS) works
+# out of the box for every visitor.
+#
+# Set MINDBRIDGE_DOMAIN as an env var before starting Caddy, e.g.:
+#   mindbridge.yourdomain.com
+# ══════════════════════════════════════════════════════════════════════════
+{$MINDBRIDGE_DOMAIN} {
+    reverse_proxy mindbridge-server:5000
+
+    encode gzip
+
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains"
+        X-Content-Type-Options "nosniff"
+        X-Frame-Options "DENY"
+    }
+
+    log {
+        output file /var/log/caddy/access.log
+    }
+}
