@@ -30,7 +30,7 @@ pipeline {
 
     environment {
         REGISTRY       = 'ghcr.io'
-        REPO_OWNER     = 'your-org'   // ← replace with real GitHub org/user
+        REPO_OWNER     = 'Dikshith118'
         SERVER_IMAGE   = "${REGISTRY}/${REPO_OWNER}/mindbridge-server"
         CLIENT_IMAGE   = "${REGISTRY}/${REPO_OWNER}/mindbridge-client"
         GIT_SHA        = "${GIT_COMMIT.take(8)}"
@@ -41,6 +41,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
+                sh 'git lfs pull'
             }
         }
 
@@ -195,7 +196,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'mindbridge-domain', variable: 'MB_DOMAIN')]) {
                     sh '''
                         for i in $(seq 1 10); do
-                            if curl -sf "https://$MB_DOMAIN/status"; then
+                            if curl -sf "http://$MB_DOMAIN/status"; then
                                 echo "Deployment healthy"
                                 exit 0
                             fi
