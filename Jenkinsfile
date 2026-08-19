@@ -28,6 +28,10 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '20'))
     }
 
+    tools {
+        'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarQube-Scanner'
+    }
+
     environment {
         REGISTRY       = 'ghcr.io'
         REPO_OWNER     = 'Dikshith118'
