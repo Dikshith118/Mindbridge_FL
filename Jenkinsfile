@@ -53,7 +53,7 @@ pipeline {
             steps {
                 sh '''
                     python -m venv .venv
-                    . .venv/bin/activate
+                    . .venv/Scripts/activate
                     pip install --upgrade pip
                     pip install -r requirements.txt
                     pip install flake8 pylint
@@ -64,7 +64,7 @@ pipeline {
         stage('Lint') {
             steps {
                 sh '''
-                    . .venv/bin/activate
+                    . .venv/Scripts/activate
                     # Fail the build only on real errors (syntax/undefined names)
                     flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
                     # Style issues reported but non-blocking
@@ -81,7 +81,7 @@ pipeline {
         stage('Unit Tests') {
             steps {
                 sh '''
-                    . .venv/bin/activate
+                    . .venv/Scripts/activate
                     pip install pytest pytest-flask pytest-cov
                     MINDBRIDGE_TEST_MODE=1 pytest tests/ -v --tb=short \
                         --junitxml=test-results.xml \
