@@ -23,7 +23,7 @@ pipeline {
     agent any
 
     options {
-        timeout(time: 45, unit: 'MINUTES')
+        timeout(time: 90, unit: 'MINUTES')
         disableConcurrentBuilds()
         buildDiscarder(logRotator(numToKeepStr: '20'))
     }
@@ -121,14 +121,17 @@ pipeline {
 
         stage('Dependency Check (OWASP)') {
             steps {
-                dependencyCheck additionalArguments: '''
-                    --scan .
-                    --format ALL
-                    --project mindbridge
-                    --failOnCVSS 8
-                    --disableAssembly
-                    --suppression dependency-check-suppressions.xml
-                ''', odcInstallation: 'owasp-dependency-check'
+                withCredentials([string(credentialsId: 'nvd-api-key', variable: 'NVD_API_KEY')]) {
+                    dependencyCheck additionalArguments: """
+                        --scan .
+                        --format ALL
+                        --project mindbridge
+                        --failOnCVSS 8
+                        --disableAssembly
+                        --suppression dependency-check-suppressions.xml
+                        --nvdApiKey ${NVD_API_KEY}
+                    """, odcInstallation: 'owasp-dependency-check'
+                }
 
                 dependencyCheckPublisher pattern: 'dependency-check-report.xml'
             }
