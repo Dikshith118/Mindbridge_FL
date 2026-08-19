@@ -28,10 +28,6 @@ pipeline {
         buildDiscarder(logRotator(numToKeepStr: '20'))
     }
 
-    tools {
-        'hudson.plugins.sonar.SonarRunnerInstallation' 'SonarQube-Scanner'
-    }
-
     environment {
         REGISTRY       = 'ghcr.io'
         REPO_OWNER     = 'Dikshith118'
@@ -98,14 +94,17 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('sonarqube') {
-                    sh '''
-                        sonar-scanner \
-                          -Dsonar.projectKey=mindbridge \
-                          -Dsonar.sources=. \
-                          -Dsonar.exclusions=".venv/**,tests/**,client_data/**,saved_model/**,data/**" \
-                          -Dsonar.python.coverage.reportPaths=coverage.xml \
-                          -Dsonar.python.flake8.reportPaths=flake8-report.txt
-                    '''
+                    script {
+                        def scannerHome = tool 'SonarQube-Scanner'
+                        sh """
+                            "${scannerHome}/bin/sonar-scanner" \
+                              -Dsonar.projectKey=mindbridge \
+                              -Dsonar.sources=. \
+                              -Dsonar.exclusions=".venv/**,tests/**,client_data/**,saved_model/**,data/**" \
+                              -Dsonar.python.coverage.reportPaths=coverage.xml \
+                              -Dsonar.python.flake8.reportPaths=flake8-report.txt
+                        """
+                    }
                 }
             }
         }
