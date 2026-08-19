@@ -600,7 +600,6 @@ def motivation():
 @app.route("/configure_server", methods=["POST"])
 def configure_server():
     """Let the user set the server IP from a browser prompt."""
-    global SERVER_URL, SERVER_IP
     data = request.get_json() or {}
     ip   = data.get("server_ip","").strip()
     if not ip: return jsonify({"error":"No IP provided"}), 400
