@@ -171,7 +171,7 @@ SPELLING_FIXES = {
 
 FUZZY_CRISIS_PATTERNS = [
     r"su[iy]?[cs][iy]?d",
-    r"kill\s*(my)?sel[fv]",
+    r"kil+\s*(my)?sel[fv]",
     r"(want|wanna)\s+to\s+d[iy]e",
     r"end\s+(my|this)\s+life",
     r"(harm|hurt)\s*(my)?sel[fv]",
