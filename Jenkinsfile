@@ -54,9 +54,9 @@ pipeline {
                 sh '''
                     python -m venv .venv
                     . .venv/Scripts/activate
-                    pip install --upgrade pip
-                    pip install -r requirements.txt
-                    pip install flake8 pylint
+                    python -m pip install --upgrade pip
+                    python -m pip install -r requirements.txt
+                    python -m pip install flake8 pylint
                 '''
             }
         }
@@ -82,7 +82,7 @@ pipeline {
             steps {
                 sh '''
                     . .venv/Scripts/activate
-                    pip install pytest pytest-flask pytest-cov
+                    python -m pip install pytest pytest-flask pytest-cov
                     MINDBRIDGE_TEST_MODE=1 pytest tests/ -v --tb=short \
                         --junitxml=test-results.xml \
                         --cov=. --cov-report=xml:coverage.xml --cov-report=term
