@@ -66,9 +66,9 @@ pipeline {
                 sh '''
                     . .venv/Scripts/activate
                     # Fail the build only on real errors (syntax/undefined names)
-                    flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+                    flake8 . --count --select=E9,F63,F7,F82 --exclude=.venv --show-source --statistics
                     # Style issues reported but non-blocking
-                    flake8 . --count --exit-zero --max-line-length=120 --statistics > flake8-report.txt
+                    flake8 . --count --exit-zero --max-line-length=120 --exclude=.venv --statistics > flake8-report.txt
                 '''
             }
             post {
