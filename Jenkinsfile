@@ -30,7 +30,7 @@ pipeline {
 
     environment {
         REGISTRY       = 'ghcr.io'
-        REPO_OWNER     = 'Dikshith118'
+        REPO_OWNER     = 'dikshith118'
         SERVER_IMAGE   = "${REGISTRY}/${REPO_OWNER}/mindbridge-server"
         CLIENT_IMAGE   = "${REGISTRY}/${REPO_OWNER}/mindbridge-client"
         GIT_SHA        = "${GIT_COMMIT.take(8)}"
