@@ -1,0 +1,33 @@
+# ══════════════════════════════════════════════════════════════════════════
+# requirements-docker.txt
+# Runtime-ONLY dependencies for the Docker images (server + client).
+#
+# This is deliberately separate from requirements.txt (your full local dev
+# environment with Jupyter, spaCy, NLTK, black, mypy, etc.) — none of that
+# is imported by app.py, client.py, chatbot.py, or retrain.py at runtime.
+# Installing it in Docker was pulling 1GB+ of unused CUDA/GPU packages and
+# is very likely what caused the previous build to fail/timeout.
+#
+# CPU-only torch — the container has no GPU, so skip CUDA entirely.
+# ══════════════════════════════════════════════════════════════════════════
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+torch==2.3.1+cpu
+transformers==4.44.2
+tokenizers==0.19.1
+sentencepiece==0.2.0
+
+flask==3.0.3
+flask-cors==4.0.1
+werkzeug==3.0.3
+requests==2.32.3
+urllib3==2.2.2
+gunicorn==22.0.0
+
+numpy==1.26.4
+matplotlib==3.9.1          # used by chatbot.py's generate_analysis_graph
+
+pyopenssl==24.2.1          # app.py self-signed cert fallback (harmless if unused behind Caddy)
+cryptography==42.0.8
+
+faster-whisper==1.0.3      # client.py /transcribe route
