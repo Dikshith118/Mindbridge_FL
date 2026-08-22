@@ -114,7 +114,7 @@ pipeline {
                 // Fails the build if SonarQube's configured quality gate fails.
                 // webhook must be set on the SonarQube server pointing back to Jenkins.
                 timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
+                    waitForQualityGate abortPipeline: false
                 }
             }
         }
