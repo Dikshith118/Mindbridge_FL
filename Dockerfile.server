@@ -20,12 +20,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
-# ── Dependency layer (cached unless requirements.txt changes) ───────────────
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
-
-# ── Pre-download DistilBERT weights at build time (avoids cold-start pull) ──
-RUN python -c "from transformers import DistilBertTokenizer, DistilBertModel; \
+# ── Dependency layer (cached unless requirements-docker.txt changes) ────────
+COPY requirements-docker.txt .
+RUN pip install --no-cache-dir -r requirements-docker.txt \
+    && python -c "from transformers import DistilBertTokenizer, DistilBertModel; \
     DistilBertTokenizer.from_pretrained('distilbert-base-uncased'); \
     DistilBertModel.from_pretrained('distilbert-base-uncased')"
 
@@ -44,6 +42,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:5000/status || exit 1
 
 # gunicorn instead of Flask's dev server for production
-RUN pip install --no-cache-dir gunicorn
-CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "2", \
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--workers", "1", \
      "--threads", "4", "--timeout", "120", "app:app"]
