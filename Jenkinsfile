@@ -152,7 +152,9 @@ pipeline {
         }
 
         stage('Push Images') {
-            when { branch 'main' }
+            when {
+    expression { env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' }
+}
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'ghcr-credentials',
@@ -171,7 +173,9 @@ pipeline {
         }
 
         stage('Deploy to VM') {
-            when { branch 'main' }
+           when {
+    expression { env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' }
+}
             steps {
                 withCredentials([
                     sshUserPrivateKey(credentialsId: 'vm-ssh-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
@@ -197,7 +201,9 @@ pipeline {
         }
 
         stage('Post-Deploy Health Check') {
-            when { branch 'main' }
+            when {
+    expression { env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' }
+}
             steps {
                 withCredentials([string(credentialsId: 'mindbridge-domain', variable: 'MB_DOMAIN')]) {
                     sh '''
