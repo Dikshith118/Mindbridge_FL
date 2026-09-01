@@ -176,49 +176,29 @@ pipeline {
     when {
         expression { env.GIT_BRANCH == 'origin/main' || env.GIT_BRANCH == 'main' }
     }
-
     steps {
         withCredentials([
-            sshUserPrivateKey(
-                credentialsId: 'vm-ssh-key',
-                keyFileVariable: 'SSH_KEY',
-                usernameVariable: 'SSH_USER'
-            ),
-            string(
-                credentialsId: 'mindbridge-domain',
-                variable: 'MB_DOMAIN'
-            ),
-            string(
-                credentialsId: 'vm-host',
-                variable: 'VM_HOST'
-            ),
+            sshUserPrivateKey(credentialsId: 'vm-ssh-key', keyFileVariable: 'SSH_KEY', usernameVariable: 'SSH_USER'),
+            string(credentialsId: 'mindbridge-domain', variable: 'MB_DOMAIN'),
+            string(credentialsId: 'vm-host', variable: 'VM_HOST'),
             usernamePassword(
                 credentialsId: 'ghcr-credentials',
                 usernameVariable: 'REG_USER',
                 passwordVariable: 'REG_PASS'
             )
         ]) {
-
             sh '''
                 scp -i "$SSH_KEY" -o StrictHostKeyChecking=no \
                     docker-compose.yml proxy/Caddyfile \
                     "$SSH_USER@$VM_HOST:/opt/mindbridge/"
 
-                ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no \
-                    "$SSH_USER@$VM_HOST" "
-                    
-                    echo '$REG_PASS' | docker login ghcr.io \
-                        -u '$REG_USER' --password-stdin &&
-
+                ssh -i "$SSH_KEY" -o StrictHostKeyChecking=no "$SSH_USER@$VM_HOST" "
+                    echo '$REG_PASS' | docker login ${REGISTRY} -u '$REG_USER' --password-stdin &&
                     cd /opt/mindbridge &&
-
                     echo 'SERVER_IMAGE=${SERVER_IMAGE}:${GIT_SHA}' > .env &&
                     echo 'MINDBRIDGE_DOMAIN=$MB_DOMAIN' >> .env &&
-
                     docker compose pull mindbridge-server retrainer &&
-
                     docker compose up -d --remove-orphans &&
-
                     docker image prune -f
                 "
             '''
